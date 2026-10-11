@@ -84,7 +84,7 @@ argument_specs:
         description: 'Whether to install multus-cni'
         type: bool
       install_whereabouts_ipam_plugin:
-        description: "Whether to install whereabouts IPAM plugin.""
+        description: "Whether to install whereabouts IPAM plugin."
         type: bool
       install_emberstack_kubernetes_secrets_reflector:
         description: "Whether to install the Emberstack Kubernetes Secrets Reflector."
