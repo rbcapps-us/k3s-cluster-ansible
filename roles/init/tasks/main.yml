@@ -9,12 +9,6 @@
   ansible.builtin.assert:
     that: install_cni_plugins
 
-- name: "Assert that install_helm is true if any of the optional components which require Helm are enabled"
-  when: 'install_whereabouts_ipam_plugin or install_headlamp or install_longhorn'
-  run_once: true
-  ansible.builtin.assert:
-    that: install_helm
-
 - name: "Get the superuser information when superuser_name is set to a non-empty value"
   when: 'superuser_name != ""'
   block:

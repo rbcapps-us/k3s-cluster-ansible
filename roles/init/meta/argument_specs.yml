@@ -71,23 +71,11 @@ argument_specs:
           This must be an odd number, and must be less than or equal to the number of hosts in the inventory hosts
           group specified in the k3s_hosts_group fact.
         type: int
-      install_helm:
-        description: |
-          Whether to install Helm.  Note that Helm is required in order to install a lot of other packages,
-          so if this is set to false, attempts to install any of the packages which require Helm will fail.
-          Helm is only installed on server nodes.
-        type: bool
       install_headlamp:
-        description: |
-          Whether to install Headlamp.
-          It is installed via Helm chart, so if install_headlamp is true
-          and install_helm is false, the play will fail.
+        description: "Whether to install Headlamp."
         type: bool
       install_longhorn:
-        description: |
-          Whether to install Longhorn block storage.
-          It is installed via Helm chart, so if install_longhorn is true
-          and install_helm is false, the play will fail.
+        description: "Whether to install Longhorn block storage."
         type: bool
       install_cni_plugins:
         description: 'Whether to install the CNI plugins on the nodes'
@@ -96,28 +84,16 @@ argument_specs:
         description: 'Whether to install multus-cni'
         type: bool
       install_whereabouts_ipam_plugin:
-        description: |
-          Whether to install whereabouts IPAM plugin.
-          It is installed via Helm chart, so if install_whereabouts_ipam_plugin is true
-          and install_helm is false, the play will fail.
+        description: "Whether to install whereabouts IPAM plugin.""
         type: bool
       install_emberstack_kubernetes_secrets_reflector:
-        description: |
-          Whether to install the Emberstack Kubernetes Secrets Reflector.
-          It is installed via a Helm chart, so if install_emberstack_kubernetes_secrets_reflector is true
-          and install_helm is false, the play will fail.
+        description: "Whether to install the Emberstack Kubernetes Secrets Reflector."
         type: bool
       install_stakater_reloader:
-        description: |
-          Whether to install the Stakater Reloader.
-          It is installed via a Helm chart, so if install_stakater_reloader is true
-          and install_helm is false, the play will fail.
+        description: "Whether to install the Stakater Reloader."
         type: bool
       install_cert_manager:
-        description: |
-          Whether to install cert-manager.
-          It is installed via a Helm chart, so if install_cert_manager is true
-          and install_helm is false, the play will fail.
+        description: "Whether to install cert-manager."
         type: bool
       install_keepalived_cluster_load_balancer:
         description: 'Whether to install the Keepalived cluster load balancer'

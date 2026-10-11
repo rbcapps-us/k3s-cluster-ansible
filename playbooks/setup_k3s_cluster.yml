@@ -10,7 +10,6 @@
       tags: [k3s, k3s_cluster]
     - role: helm
       tags: [helm]
-      when: install_helm
     - role: longhorn
       tags: [longhorn]
       when: install_longhorn

@@ -12,8 +12,6 @@ kube_api_group_id: null
 
 num_k3s_server_nodes: '{{ 3 if (groups[k3s_hosts_group] | length) >= 3 else 1 }}'
 
-install_helm: true
-
 install_headlamp: true
 
 install_longhorn: true
