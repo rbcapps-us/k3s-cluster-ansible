@@ -96,3 +96,7 @@ Delete the test pods and associated resources, and remove the temporary YAML man
 sudo kubectl delete -f /tmp/lhtest.yaml
 rm -f /tmp/lhtest.yaml
 ```
+
+## Adding a Local CA and HTTPS (TLS) to the Test Cluster
+
+See [CLUSTER_TLS_AND_LOAD_BALANCER.md](CLUSTER_TLS_AND_LOAD_BALANCER.md) for a complete walk-through of how to create a CA private key and certificate pair, configure `cert-manager` to use it to issue a cluster-wide HTTPS (TLS) certificate which auto-renews, and configure the traefik ingress to use it for all incoming HTTP/HTTPS traffic.

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+spec:
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+  containers:
+  - name: busybox
+    image: busybox
+    command: ["sleep", "infinity"]
+    volumeMounts:
+    - name: cluster-local-ca-cert-volume
+      mountPath: /etc/ssl/certs/k3-test-root-ca.crt
+      subPath: k3-test-root-ca.crt
+  volumes:
+  - name: cluster-local-ca-cert-volume
+    secret:
+      secretName: cluster-local-ca-cert
+      items:
+      - key: ca.crt
+        path: k3-test-root-ca.crt
+  restartPolicy: Never
