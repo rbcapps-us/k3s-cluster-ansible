@@ -83,3 +83,7 @@ Validate playbooks and roles for lint errors:
     git push origin v1.0.0
     ``` 
 * In GitHub, create a release from the new tag.  Upload the newly built tarball to the new release.
+
+## Known, Unhandled Edge Cases
+
+Upgrading a single-node cluster to a different K3s version, while simultaneously adding nodes to the cluster in the same play, may result in complete loss of the cluster state.  Don't do this.  If you need to add nodes to a single-node cluster, ensure that `k3s_version` is set to the same K3s version which the single-node cluster is running before running the play to add nodes to the cluster.  If you need to upgrade to a different K3s version, it is easiest to upgrade the single-node cluster to the new K3s version first, then add the nodes to the cluster in a separate play.  However, if you want maximum safety, it might be safer to add the new nodes to the cluster, running the same exact K3s version as the existing node, then upgrade the entire cluster to the new K3s version in a subsequent play.
