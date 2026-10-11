@@ -55,10 +55,9 @@
         state: absent
       loop: '{{ uninstall_k3s_dirs_and_files_to_remove }}'
 
-    - name: "Remove the {{ k3s_user_home }}.kube directory"
-      when: create_k3s_user
+    - name: "Remove the {{ kube_api_user_home }}.kube directory"
       ansible.builtin.file:
-        path: "{{ k3s_user_home }}/.kube"
+        path: "{{ kube_api_user_home }}/.kube"
         state: absent
 
     - name: "Attempt to remove empty directories"

@@ -141,7 +141,7 @@
   become: true
   ansible.builtin.file:
     path: '/etc/rancher/k3s/k3s.yaml'
-    group: '{{ k3s_group }}'
+    group: '{{ kube_api_group }}'
     state: file
     mode: '0640'
 
@@ -179,22 +179,22 @@
         state: link
         force: true
 
-- name: "Create the ~/.kube directory for the {{ k3s_user }} user, if we created the user"
-  when: 'create_k3s_user and node_k3s_role == "server"'
+- name: "Create the ~/.kube directory for the {{ kube_api_user }} user, if we created the user"
+  when: 'node_k3s_role == "server"'
   become: true
-  become_user: "{{ k3s_user }}"
+  become_user: "{{ kube_api_user }}"
   block:
-    - name: "Make the {{ k3s_user }} user's .kube directory"
+    - name: "Make the {{ kube_api_user }} user's .kube directory"
       ansible.builtin.file:
-        path: '{{ k3s_user_home }}/.kube'
+        path: '{{ kube_api_user_home }}/.kube'
         state: directory
-        owner: '{{ k3s_user | trim }}'
-        group: '{{ k3s_group | trim }}'
+        owner: '{{ kube_api_user | trim }}'
+        group: '{{ kube_api_group | trim }}'
         mode: '0750'
 
-    - name: "Link /etc/rancher/k3s/k3s.yaml to the {{ k3s_user }} user's .kube/config"
+    - name: "Link /etc/rancher/k3s/k3s.yaml to the {{ kube_api_user }} user's .kube/config"
       ansible.builtin.file:
         src: '/etc/rancher/k3s/k3s.yaml'
-        path: '{{ k3s_user_home }}/.kube/config'
+        path: '{{ kube_api_user_home }}/.kube/config'
         state: link
         force: true

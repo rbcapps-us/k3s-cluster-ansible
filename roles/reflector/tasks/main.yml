@@ -1,7 +1,7 @@
 - name: "Run Emberstack Kubernetes Secrets Reflector installation tasks"
   run_once: true
   become: true
-  become_user: "{{ k3s_user if create_k3s_user else superuser_name }}"
+  become_user: "{{ kube_api_user }}"
   block:
     - name: "Install or upgrade Emberstack Kubernetes Secrets Reflector via the Emberstack Kubernetes Secrets Reflector Helm chart"
       ansible.builtin.include_role:

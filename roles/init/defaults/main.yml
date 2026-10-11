@@ -3,13 +3,12 @@ superuser_name: ""
 k3s_hosts_group: "all_hosts"
 k3s_storage_dir: ""
 
-create_k3s_user: true
-k3s_user: k3s
-k3s_user_id: 2121
-k3s_user_home: "/home/{{ k3s_user }}"
+kube_api_user: k3s
+kube_api_user_id: null
+kube_api_user_home: "/home/{{ kube_api_user }}"
 
-k3s_group: k3s
-k3s_group_id: 2121
+kube_api_group: k3s
+kube_api_group_id: null
 
 num_k3s_server_nodes: '{{ 3 if (groups[k3s_hosts_group] | length) >= 3 else 1 }}'
 

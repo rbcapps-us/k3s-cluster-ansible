@@ -10,7 +10,7 @@ argument_specs:
       your playbook):
         - name: "Install or upgrade <package-name>"
           become: true
-          become_user: "{{ k3s_user if create_k3s_user else superuser_name }}"
+          become_user: "{{ kube_api_user }}"
           block:
             - name: "Install or upgrade <package-name> via the <package-name> Helm chart"
               ansible.builtin.include_role:

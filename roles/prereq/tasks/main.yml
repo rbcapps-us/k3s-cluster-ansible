@@ -35,31 +35,23 @@
 # CREATE THE K3S GROUP; CREATE OR DELETE THE K3S USER AS NEEDED BASED ON CONFIGURATION #
 ########################################################################################
 
-- name: "Delete the {{ k3s_user }} user if it exists on this host but should not"
-  when: 'not (create_k3s_user and node_k3s_role == "server")'
-  become: true
-  ansible.builtin.user:
-    name: '{{ k3s_user }}'
-    state: absent
-    remove: true
-
-- name: "Create the {{ k3s_group }} group with gid {{ k3s_group_id }} if this is a server node"
+- name: "Create the {{ kube_api_group }} group with gid {{ kube_api_group_id }} if this is a server node"
   when: 'node_k3s_role == "server"'
   become: true
   ansible.builtin.group:
-    name: '{{ k3s_group }}'
-    gid: '{{ k3s_group_id }}'
+    name: '{{ kube_api_group }}'
+    gid: '{{ kube_api_group_id }}'
     state: present
 
-- name: "Create the {{ k3s_user }} user with uid {{ k3s_user_id }} if this is a server node, and the option to create the ks user is enabled"
-  when: 'create_k3s_user and node_k3s_role == "server"'
+- name: "Create the {{ kube_api_user }} user with uid {{ kube_api_user_id }} if this is a server node, and the option to create the ks user is enabled"
+  when: 'node_k3s_role == "server"'
   become: true
   ansible.builtin.user:
-    name: '{{ k3s_user }}'
-    uid: '{{ k3s_user_id }}'
-    group: '{{ k3s_group }}'
+    name: '{{ kube_api_user }}'
+    uid: '{{ kube_api_user_id }}'
+    group: '{{ kube_api_group }}'
     shell: '/bin/bash'
     system: true
-    home: '{{ k3s_user_home }}'
+    home: '{{ kube_api_user_home }}'
     create_home: true
     state: present

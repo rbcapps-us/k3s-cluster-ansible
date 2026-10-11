@@ -28,30 +28,35 @@ argument_specs:
           when k3s is first installed on each node, from the default data directory to this
           directory.
         type: str
-      create_k3s_user:
+      kube_api_user:
         description: |
-          Whether to create a special user which can access the kubeconfig file and run kubectl commands on the cluster
-        type: bool
-      k3s_user:
-        description: 'Username for the k3s user'
+            Username for the user which will be created with access to the Kubernetes API.
+            This user will be a member of the group specified in `kube_api_group`, and will
+            also have a `$HOME/.kube/config` symlink to `/etc/rancher/k3s/k3s.yaml` created,
+            allowing it to access the Kubernetes API.
         type: str
-      k3s_user_id:
-        description: 'UID for the k3s user'
+      kube_api_user_id:
+        description: |
+          UID for the Kubernetes API user.  Optional.  Defaults to `null`.
+          If specified, the Kubernetes API user will be created with the specified UID.
         type: int
-      k3s_user_home:
-        description: 'Home directory for the k3s user'
+      kube_api_user_home:
+        description: 'Home directory for the Kubernetes API user'
         type: str
-      k3s_group:
+      kube_api_group:
         description: |
-          Group name for the k3s group.
-          The k3s group is always created on server nodes, because the group ownership of the kubeconfig file
-          (/etc/rancher/k3s/k3s.yaml) is set to this group when k3s is installed in server mode on a node.
-          This allows any user who is a member of the k3s group to access the kubeconfig file, in order to run kubectl
-          commands on the cluster.
-          The k3s group will only be created on server nodes.
+          Group name for the group which allows users to access the `/etc/rancher/k3s/k3s.yaml` file, which
+          is required to access the Kubernetes API.
+          This group is always created on server nodes, because the group ownership of the kubeconfig file
+          `/etc/rancher/k3s/k3s.yaml` is set to this group when k3s is installed in server mode on a node.
+          This allows any user who is a member of the k3s group to access the kubeconfig file, in order to
+          run kubectl commands on the cluster.
+          This group will only be created on server nodes.
         type: str
-      k3s_group_id:
-        description: 'GID for the k3s group'
+      kube_api_group_id:
+        description: |
+          GID for the Kubernetes API group.  Optional.  Defaults to `null`.
+          If specified, the Kubernetes API group will be created with the specified GID.
         type: int
       num_k3s_server_nodes:
         description: |
