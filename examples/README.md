@@ -50,7 +50,7 @@ ansible-playbook -i "$INVPATH" -u ansible --become-password-file "$BECOMEPWFILE"
 
 At the end of the playbook, there should be a Headlamp token.  Point a browser to <http://k3s-test-01.local/headlamp>, copy and paste the token into the token field, and click *Authenticate*.  Click on *Workloads* -> *Pods* to see all of the pods which are running on the cluster.
 
-You can also access the Longhorn dashboard at <http://k3s-test-01.local/longhorn>.  The login credentials are set in the `longhorn_ui_credentials` setting in [../roles/init/defaults/main.yml](../roles/init/defaults/main.yml), and can be overridden in your inventory (or your calling role or playbook, if you're writing your own playbooks or roles).
+You can also access the Longhorn dashboard at <http://k3s-test-01.local/longhorn>.  The login credentials are set in the `longhorn_ui_credentials` setting in [../roles/longhorn/defaults/main.yml](../roles/longhorn/defaults/main.yml), and can be overridden in your inventory (or your calling role or playbook, if you're writing your own playbooks or roles).
 
 ## Testing a Longhorn Shared Volume Between Two Pods
 
@@ -96,68 +96,3 @@ Delete the test pods and associated resources, and remove the temporary YAML man
 sudo kubectl delete -f /tmp/lhtest.yaml
 rm -f /tmp/lhtest.yaml
 ```
-
-## Creating a production project
-
-Copy the *examples* directory to a new directory outside of this project.
-
-Modify the requirements.yml to use a production tag of the *roncemer.k3s_cluster_ansible* Galaxy collection.
-
-Remove any non-production copy of the *roncemer.k3s_cluster_ansible* collection, and reinstall the configured version:
-```sh
-rm -rf ~/.ansible/collections/ansible_collections/roncemer/k3s_cluster_ansible
-ansible-galaxy install -r requirements.yml
-```
-
-Create a file named *inventories/k3s-test-cluster/ansible-become-password.txt*, and put the password for the *ansible* user on your cluster.
-
-## Summary of Playboks in the Collection
-
-This collection contains the following playbooks:
-
-* [roncemer.k3s_cluster_ansible.setup_k3s_cluster](../playbooks/setup_k3s_cluster.yml): Builds out a K3s cluster across the nodes (hosts) in the inventory.
-* [roncemer.k3s_cluster_ansible.headlamp_token](../playbooks/headlamp_token.yml): Creates a new token for logging into the Headlamp dashboard.
-* [roncemer.k3s_cluster_ansible.uninstall_k3s](../playbooks/uninstall_k3s.yml): Uninstalls k3s from all nodes (hosts) in the inventory.
-* [roncemer.k3s_cluster_ansible.alive_check](../playbooks/alive_check.yml): Confirms that all nodes are alive and reachable.
-* [roncemer.k3s_cluster_ansible.reboot](../playbooks/reboot.yml): Reboots all nodes.
-* [roncemer.k3s_cluster_ansible.shutdown](../playbooks/shutdown.yml): Shuts down all nodes.
-
-## Playbook Defaults
-
-The default values for the roles in the playbook are stored in [../roles/init/defaults/main.yml](../roles/init/defaults/main.yml), and each customizable default is documented in [../roles/init/meta/argument_specs.yml](../roles/init/meta/argument_specs.yml).  You can override these values by setting them in the inventory, or, if you are calling roles directly from your own playbooks, by explicitly setting facts or passing vars to the roles which you call.
-
-## Re-using Roles in your own Playbooks
-
-If you need to write your own playbooks, as opposed to just using the playbooks which are provided in this collection, you can simply make a local copy of any of the above-referenced playbooks in your own project, and do your customizations.
-
-## Developing this Project
-
-Install `ansible-lint` on MacOS:
-```sh
-brew install ansible-lint
-```
-
-Validate playbooks and roles for lint errors:
-```sh
-./validate-lint
-```
-
-## Publishing a new version of the Galaxy collection
-
-* Update the version in galaxy.yml
-* Run:
-    ```sh
-    ansible-galaxy collection build
-    ```
-* Publish the collection, either by CLI:
-    ```sh
-    ansible-galaxy collection publish roncemer-k3s_cluster_ansible-1.0.0.tar.gz --api-key <ansible-galaxy-token-goes-here>
-    ```
-  or by going to [https://galaxy.ansible.com/ui/my-namespaces/](https://galaxy.ansible.com/ui/my-namespaces/), clicking *View collections* under the correct namespace, clicking *Upload collection*, and selecting the collection tarball.
-
-* Create and push a git tag with the same version as the collection version (replace 1.0.0 with the correct version everywhere in the commands below):
-    ```sh
-    git tag -a v1.0.0 -m "Release version 1.0.0"
-    git push origin v1.0.0
-    ``` 
-* In GitHub, create a release from the new tag.  Upload the newly built tarball to the new release.
