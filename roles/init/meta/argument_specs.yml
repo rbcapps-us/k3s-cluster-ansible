@@ -37,8 +37,11 @@ argument_specs:
         type: str
       kube_api_user_id:
         description: |
-          UID for the Kubernetes API user.  Optional.  Defaults to `null`.
+          UID for the Kubernetes API user.  Optional.  Defaults to `null`, which will cause the
+          operating system to just use the next available UID.
           If specified, the Kubernetes API user will be created with the specified UID.
+          If this UID is specified in a cluster's inventory, once this user has been created,
+          this UID must *NEVER* be changed again on that cluster.
         type: int
       kube_api_user_home:
         description: 'Home directory for the Kubernetes API user'
@@ -55,8 +58,11 @@ argument_specs:
         type: str
       kube_api_group_id:
         description: |
-          GID for the Kubernetes API group.  Optional.  Defaults to `null`.
+          GID for the Kubernetes API group.  Optional.  Defaults to `null`, which will cause the
+          operating system to just use the next available GID.
           If specified, the Kubernetes API group will be created with the specified GID.
+          If this GID is specified in a cluster's inventory, once this user has been created,
+          this GID must *NEVER* be changed again on that cluster.
         type: int
       num_k3s_server_nodes:
         description: |

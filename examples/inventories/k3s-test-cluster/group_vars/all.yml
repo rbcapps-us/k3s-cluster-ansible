@@ -2,6 +2,10 @@
 ansible_become_exe: /usr/bin/sudo.ws
 
 k3s_storage_dir: "/storage"
+
+kube_api_user_id: 2121
+kube_api_group_id: 2121
+
 install_cni_plugins: true
 install_multus_cni: true
 
