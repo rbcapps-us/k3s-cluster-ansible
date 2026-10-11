@@ -60,13 +60,16 @@
       {% endif %}
             | kubectl diff -f - 2>&1
       helm_template_kubectl_diff_retval="$?"
-      if [ "$helm_template_kubectl_diff_retval" -ne 0 ] && [ "$helm_template_kubectl_diff_retval" -ne 1 ]; then
-          echo "Error occurred during helm template and kubectl diff" >&2
-          exit "$helm_template_kubectl_diff_retval"
-      fi
       set -e
 
-      if [ "$installed_helm_chart_version" != {{ helm_chart_version | quote }} ] ||[ "$helm_template_kubectl_diff_retval" -ne 0 ]; then
+      if [ "$helm_template_kubectl_diff_retval" -ne 0 ] && [ "$helm_template_kubectl_diff_retval" -ne 1 ]; then
+        # Exit code 1 from kubectl diff indicates differences were found.
+        # Any other non-zero exit code indicates an unexpected error.
+          echo "Helm template and kubectl diff failed with unexpected return code $helm_template_kubectl_diff_retval" >&2
+          exit "$helm_template_kubectl_diff_retval"
+      fi
+
+      if [ "$installed_helm_chart_version" != {{ helm_chart_version | quote }} ] || [ "$helm_template_kubectl_diff_retval" -ne 0 ]; then
           printf "Upgrading the %s release via the Helm chart\n" {{ helm_release_name | quote }}
           helm upgrade {{ helm_release_name | quote }} {{ helm_chart_ref | quote }} \
               --namespace {{ helm_namespace | quote }} \
