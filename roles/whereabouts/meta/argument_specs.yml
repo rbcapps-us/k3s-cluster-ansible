@@ -1,0 +1,11 @@
+argument_specs:
+  main:
+    short_description: "Install or upgrade the Whereabouts IPAM plugin"
+    options:
+      whereabouts_ipam_plugin_helm_chart_version:
+        description: 'The version of whereabouts helm chart to install'
+        type: str
+      whereabouts_ipam_plugin_helm_extra_args:
+        description: 'List of extra arguments to pass to Helm when installing the Whereabouts Helm chart'
+        type: list
+        elements: str

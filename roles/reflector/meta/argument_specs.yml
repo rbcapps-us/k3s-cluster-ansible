@@ -1,0 +1,11 @@
+argument_specs:
+  main:
+    short_description: "Install or upgrade the Emberstack Kubernetes Secrets Reflector"
+    options:
+      emberstack_kubernetes_secrets_reflector_helm_chart_version:
+        description: 'The version of the Emberstack Kubernetes Secrets Reflector helm chart to install'
+        type: str
+      emberstack_kubernetes_secrets_reflector_helm_extra_args:
+        description: 'List of extra arguments to pass to Helm when installing the Emberstack Kubernetes Secrets Reflector Helm chart'
+        type: list
+        elements: str

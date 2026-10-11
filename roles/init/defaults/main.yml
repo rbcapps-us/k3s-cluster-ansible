@@ -1,15 +1,12 @@
 superuser_name: ""
 
 k3s_hosts_group: "all_hosts"
-k3s_version: "v1.37.0+k3s1"
-k3s_cluster_pod_network_cidr: "10.100.0.0/16"
-k3s_enable_wireguard_network_encryption: true
 k3s_storage_dir: ""
 
 create_k3s_user: true
 k3s_user: k3s
-k3s_user_home: "/home/{{ k3s_user }}"
 k3s_user_id: 2121
+k3s_user_home: "/home/{{ k3s_user }}"
 
 k3s_group: k3s
 k3s_group_id: 2121
@@ -17,158 +14,21 @@ k3s_group_id: 2121
 num_k3s_server_nodes: '{{ 3 if (groups[k3s_hosts_group] | length) >= 3 else 1 }}'
 
 install_helm: true
-helm_version: "v4.3.0"
 
 install_headlamp: true
-headlamp_helm_chart_version: "0.45.0"
-headlamp_helm_base_args:
-  - --set
-  - serviceAccount.create=true
-  - --set
-  - serviceAccount.name=headlamp-admin
-  - --set
-  - clusterRole.create=true
-  - --set
-  - clusterRole.name=cluster-admin
-headlamp_ingress_enabled: true
-headlamp_ingress_path: "/headlamp"
-headlamp_ingress_path_type: "Prefix"
-headlamp_ingress_middlewares:
-  - "kube-system-add-trailing-slash-headlamp@kubernetescrd"
-headlamp_ingress_extra_annotations: {}
-headlamp_ingress_annotations_combined: |
-  {{
-      { "traefik.ingress.kubernetes.io/router.middlewares": (headlamp_ingress_middlewares | join(",")) }
-      | combine(headlamp_ingress_extra_annotations)
-  }}
-headlamp_helm_ingress_args: |
-  {{
-    [
-      "--set",
-      "config.baseURL=" + headlamp_ingress_path,
-      "--set",
-      "ingress.enabled=" + ("true" if headlamp_ingress_enabled else "false"),
-    ] +
-    (
-      [
-        "--set",
-        "ingress.hosts[0].paths[0].path=" + headlamp_ingress_path,
-        "--set",
-        "ingress.hosts[0].paths[0].type=" + headlamp_ingress_path_type,
-        "--set-json",
-        "ingress.annotations=" + (headlamp_ingress_annotations_combined | to_json),
-      ] if headlamp_ingress_enabled else []
-    )
-  }}
-headlamp_helm_extra_args: []
 
 install_longhorn: true
-longhorn_helm_chart_version: "1.13.0"
-longhorn_default_volume_replica_count: '{{ 3 if (groups[k3s_hosts_group] | length) >= 5 else 2 if (groups[k3s_hosts_group] | length) >= 3 else 1 }}'
-longhorn_helm_base_args:
-  - --set
-  - defaultSettings.defaultDataLocality=best-effort
-  - --set
-  - persistence.defaultClass=false
-  - --set
-  - persistence.defaultClassReplicaCount={{ longhorn_default_volume_replica_count | quote }}
-  - --set
-  - defaultSettings.defaultReplicaCount={{ longhorn_default_volume_replica_count | quote }}
-  - --set
-  - persistence.migratable=true
-longhorn_helm_storage_dir_args: |
-  {{
-    (
-      [
-        "--set",
-        "defaultSettings.defaultDataPath=" + k3s_storage_dir + "/longhorn",
-        "--set",
-        "defaultSettings.logPath=" + k3s_storage_dir + "/longhorn/logs",
-      ] if k3s_storage_dir != "" else []
-    )
-  }}
-longhorn_ingress_enabled: false
-longhorn_ingress_path: "/longhorn"
-longhorn_ingress_path_type: "Prefix"
-longhorn_ingress_middlewares:
-  - "longhorn-system-basic-auth-longhorn-ui@kubernetescrd"
-  - "longhorn-system-add-trailing-slash-longhorn-ui@kubernetescrd"
-  - "longhorn-system-strip-prefix-longhorn-ui@kubernetescrd"
-longhorn_ingress_extra_annotations: {}
-longhorn_ingress_annotations_combined: |
-  {{
-      { "traefik.ingress.kubernetes.io/router.middlewares": (longhorn_ingress_middlewares | join(",")) }
-      | combine(longhorn_ingress_extra_annotations)
-  }}
-longhorn_helm_ingress_args: |
-  {{
-    [
-      "--set",
-      "ingress.enabled=" + ("true" if longhorn_ingress_enabled else "false"),
-    ] +
-    (
-      [
-        "--set",
-        "ingressClassName=traefik",
-        "--set",
-        "ingress.host=",
-        "--set",
-        "ingress.path=" + longhorn_ingress_path,
-        "--set",
-        "ingress.pathType=" + longhorn_ingress_path_type,
-        "--set-json",
-        "ingress.annotations=" + (longhorn_ingress_annotations_combined | to_json),
-      ] if longhorn_ingress_enabled else []
-    )
-  }}
-longhorn_helm_extra_args: []
-longhorn_ui_credentials: []
 
 install_cni_plugins: false
-cni_plugins_version: "v1.9.1"
 
 install_multus_cni: false
-multus_cni_version: "v4.3.1"
-multus_cni_protocol_version: "1.0.0"
 
 install_whereabouts_ipam_plugin: true
-whereabouts_ipam_plugin_helm_chart_version: "0.9.4"
-whereabouts_ipam_plugin_helm_extra_args: []
 
 install_emberstack_kubernetes_secrets_reflector: true
-emberstack_kubernetes_secrets_reflector_helm_chart_version: "10.0.2"
-emberstack_kubernetes_secrets_reflector_helm_extra_args: []
 
 install_stakater_reloader: true
-stakater_reloader_helm_chart_version: "2.2.17"
-stakater_reloader_helm_extra_args: []
 
 install_cert_manager: true
-cert_manager_helm_chart_version: "v1.19.2"
-cert_manager_helm_extra_args: []
 
 install_keepalived_cluster_load_balancer: true
-cluster_load_balancer_services: []
-  # Typical setting for HTTP and HTTPS services.
-  # Be sure to replace the ip_address with the real IP address which on which you will expose the HTTP and HTTPS services.
-  # - vrrp_instance_name: http_https
-  #   network_interface: eth0
-  #   virtual_router_id: 51
-  #   ip_address: 1.2.3.4
-  #   ports:
-  #     - port_number: 80
-  #       health_check_protocol: http
-  #       health_check_path: /
-  #       health_check_healthy_status_codes: 200-299,404
-  #     - port_number: 443
-  #       health_check_protocol: https
-  #       health_check_path: /
-  #       health_check_healthy_status_codes: 200-299,404
-  # Typical settings for TCP services (this example is for CloudNativePG [PostgreSQL] on port 5432):
-  # - vrrp_instance_name: cnpg1
-  #   network_interface: eth0
-  #   virtual_router_id: 53
-  #   ip_address: 1.2.3.5
-  #   ports:
-  #     - port_number: 5432
-  #       health_check_protocol: tcp

@@ -15,12 +15,6 @@
   ansible.builtin.assert:
     that: install_helm
 
-- name: "Assert that at least one set of Longhorn UI credentials is provided if the Longhorn ingress is enabled"
-  when: 'install_longhorn and longhorn_ingress_enabled'
-  run_once: true
-  ansible.builtin.assert:
-    that: 'longhorn_ui_credentials | length > 0'
-
 - name: "Get the superuser information when superuser_name is set to a non-empty value"
   when: 'superuser_name != ""'
   block:

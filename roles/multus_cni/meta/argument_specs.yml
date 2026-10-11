@@ -1,0 +1,10 @@
+argument_specs:
+  main:
+    short_description: "Install or upgrade Multus CNI"
+    options:
+      multus_cni_version:
+        description: 'The version of multus-cni to install'
+        type: str
+      multus_cni_protocol_version:
+        description: 'The CNI protocol version for multus-cni'
+        type: str

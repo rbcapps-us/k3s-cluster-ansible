@@ -1,0 +1,41 @@
+headlamp_helm_chart_version: "0.45.0"
+headlamp_helm_base_args:
+  - --set
+  - serviceAccount.create=true
+  - --set
+  - serviceAccount.name=headlamp-admin
+  - --set
+  - clusterRole.create=true
+  - --set
+  - clusterRole.name=cluster-admin
+headlamp_ingress_enabled: true
+headlamp_ingress_path: "/headlamp"
+headlamp_ingress_path_type: "Prefix"
+headlamp_ingress_middlewares:
+  - "kube-system-add-trailing-slash-headlamp@kubernetescrd"
+headlamp_ingress_extra_annotations: {}
+headlamp_ingress_annotations_combined: |
+  {{
+      { "traefik.ingress.kubernetes.io/router.middlewares": (headlamp_ingress_middlewares | join(",")) }
+      | combine(headlamp_ingress_extra_annotations)
+  }}
+headlamp_helm_ingress_args: |
+  {{
+    [
+      "--set",
+      "config.baseURL=" + headlamp_ingress_path,
+      "--set",
+      "ingress.enabled=" + ("true" if headlamp_ingress_enabled else "false"),
+    ] +
+    (
+      [
+        "--set",
+        "ingress.hosts[0].paths[0].path=" + headlamp_ingress_path,
+        "--set",
+        "ingress.hosts[0].paths[0].type=" + headlamp_ingress_path_type,
+        "--set-json",
+        "ingress.annotations=" + (headlamp_ingress_annotations_combined | to_json),
+      ] if headlamp_ingress_enabled else []
+    )
+  }}
+headlamp_helm_extra_args: []

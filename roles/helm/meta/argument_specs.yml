@@ -1,0 +1,7 @@
+argument_specs:
+  main:
+    short_description: "Install or upgrade Helm"
+    options:
+      helm_version:
+        description: 'The version of Helm to install'
+        type: str

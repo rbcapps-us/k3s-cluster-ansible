@@ -1,3 +1,9 @@
+- name: "Assert that at least one set of Longhorn UI credentials is provided if the Longhorn ingress is enabled"
+  when: longhorn_ingress_enabled
+  run_once: true
+  ansible.builtin.assert:
+    that: 'longhorn_ui_credentials | length > 0'
+
 - name: "Install required packages for Longhorn"
   become: true
   become_user: "{{ superuser_name }}"

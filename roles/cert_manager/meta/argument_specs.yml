@@ -1,0 +1,11 @@
+argument_specs:
+  main:
+    short_description: "Install or upgrade cert-manager"
+    options:
+      cert_manager_helm_chart_version:
+        description: 'The version of the cert-manager helm chart to install'
+        type: str
+      cert_manager_helm_extra_args:
+        description: 'List of extra arguments to pass to Helm when installing the cert-manager Helm chart'
+        type: list
+        elements: str

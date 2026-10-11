@@ -1,0 +1,13 @@
+argument_specs:
+  main:
+    short_description: "Install or upgrade the K3s cluster"
+    options:
+      k3s_version:
+        description: 'The version of k3s to install on the nodes'
+        type: str
+      k3s_cluster_pod_network_cidr:
+        description: "The CIDR (subnet) for the k3s cluster's internal pod network"
+        type: str
+      k3s_enable_wireguard_network_encryption:
+        description: 'Whether to enable wireguard encryption of network packets between nodes'
+        type: bool

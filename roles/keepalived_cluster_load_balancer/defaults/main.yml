@@ -1,0 +1,24 @@
+cluster_load_balancer_services: []
+  # Typical setting for HTTP and HTTPS services.
+  # Be sure to replace the ip_address with the real IP address which on which you will expose the HTTP and HTTPS services.
+  # - vrrp_instance_name: http_https
+  #   network_interface: eth0
+  #   virtual_router_id: 51
+  #   ip_address: 1.2.3.4
+  #   ports:
+  #     - port_number: 80
+  #       health_check_protocol: http
+  #       health_check_path: /
+  #       health_check_healthy_status_codes: 200-299,404
+  #     - port_number: 443
+  #       health_check_protocol: https
+  #       health_check_path: /
+  #       health_check_healthy_status_codes: 200-299,404
+  # Typical settings for TCP services (this example is for CloudNativePG [PostgreSQL] on port 5432):
+  # - vrrp_instance_name: cnpg1
+  #   network_interface: eth0
+  #   virtual_router_id: 53
+  #   ip_address: 1.2.3.5
+  #   ports:
+  #     - port_number: 5432
+  #       health_check_protocol: tcp

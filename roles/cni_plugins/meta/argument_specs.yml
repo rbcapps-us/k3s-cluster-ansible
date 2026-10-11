@@ -1,0 +1,7 @@
+argument_specs:
+  main:
+    short_description: "Install or upgrade the CNI plugins"
+    options:
+      cni_plugins_version:
+        description: 'The version of the CNI plugins to install'
+        type: str

@@ -1,0 +1,2 @@
+emberstack_kubernetes_secrets_reflector_helm_chart_version: "10.0.2"
+emberstack_kubernetes_secrets_reflector_helm_extra_args: []

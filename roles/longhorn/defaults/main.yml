@@ -1,0 +1,60 @@
+longhorn_helm_chart_version: "1.13.0"
+longhorn_default_volume_replica_count: '{{ 3 if (groups[k3s_hosts_group] | length) >= 5 else 2 if (groups[k3s_hosts_group] | length) >= 3 else 1 }}'
+longhorn_helm_base_args:
+  - --set
+  - defaultSettings.defaultDataLocality=best-effort
+  - --set
+  - persistence.defaultClass=false
+  - --set
+  - persistence.defaultClassReplicaCount={{ longhorn_default_volume_replica_count | quote }}
+  - --set
+  - defaultSettings.defaultReplicaCount={{ longhorn_default_volume_replica_count | quote }}
+  - --set
+  - persistence.migratable=true
+longhorn_helm_storage_dir_args: |
+  {{
+    (
+      [
+        "--set",
+        "defaultSettings.defaultDataPath=" + k3s_storage_dir + "/longhorn",
+        "--set",
+        "defaultSettings.logPath=" + k3s_storage_dir + "/longhorn/logs",
+      ] if k3s_storage_dir != "" else []
+    )
+  }}
+longhorn_ingress_enabled: false
+longhorn_ingress_path: "/longhorn"
+longhorn_ingress_path_type: "Prefix"
+longhorn_ingress_middlewares:
+  - "longhorn-system-basic-auth-longhorn-ui@kubernetescrd"
+  - "longhorn-system-add-trailing-slash-longhorn-ui@kubernetescrd"
+  - "longhorn-system-strip-prefix-longhorn-ui@kubernetescrd"
+longhorn_ingress_extra_annotations: {}
+longhorn_ingress_annotations_combined: |
+  {{
+      { "traefik.ingress.kubernetes.io/router.middlewares": (longhorn_ingress_middlewares | join(",")) }
+      | combine(longhorn_ingress_extra_annotations)
+  }}
+longhorn_helm_ingress_args: |
+  {{
+    [
+      "--set",
+      "ingress.enabled=" + ("true" if longhorn_ingress_enabled else "false"),
+    ] +
+    (
+      [
+        "--set",
+        "ingressClassName=traefik",
+        "--set",
+        "ingress.host=",
+        "--set",
+        "ingress.path=" + longhorn_ingress_path,
+        "--set",
+        "ingress.pathType=" + longhorn_ingress_path_type,
+        "--set-json",
+        "ingress.annotations=" + (longhorn_ingress_annotations_combined | to_json),
+      ] if longhorn_ingress_enabled else []
+    )
+  }}
+longhorn_helm_extra_args: []
+longhorn_ui_credentials: []
