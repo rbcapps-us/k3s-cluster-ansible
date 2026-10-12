@@ -1,11 +1,14 @@
-apiVersion: v1
-kind: StatefulSeet
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: busybox
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: busybox
   template:
     metadata:
       labels:
