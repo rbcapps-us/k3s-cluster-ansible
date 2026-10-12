@@ -15,8 +15,9 @@ longhorn_ui_credentials:
     password: "adMiNlH3223"
 
 
-# Example configuration for enabling cluster-wide TLS for HTTP/HTTPS endpoints by using cert-manager
-# to issue certificates, given a user-supplied Certificate Authority (CA) private key and public certificate pair.
+# Example configuration for enabling cluster-wide TLS for HTTP/HTTPS endpoints.
+# This uses cert-manager to issue certificates, given a user-supplied Certificate Authority
+# (CA) private key and public certificate pair.
 # This requires user-supplied values for the CA private key and public certificate, as well
 # as a user-supplied list of domains for the cluster-wide TLS certificate.
 
