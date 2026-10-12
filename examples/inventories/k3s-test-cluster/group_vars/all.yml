@@ -14,6 +14,33 @@ longhorn_ui_credentials:
   - username: "lhadmin"
     password: "adMiNlH3223"
 
+
+# Example configuration for enabling cluster-wide TLS for HTTP/HTTPS endpoints by using cert-manager
+# to issue certificates, given a user-supplied Certificate Authority (CA) private key and public certificate pair.
+# This requires user-supplied values for the CA private key and public certificate, as well
+# as a user-supplied list of domains for the cluster-wide TLS certificate.
+
+# cert_manager_cluster_local_ca_cert: |
+#   -----BEGIN CERTIFICATE-----
+#   ...
+#   -----END CERTIFICATE-----
+# cert_manager_cluster_local_ca_private_key: |
+#   -----BEGIN PRIVATE KEY-----
+#   ...
+#   -----END PRIVATE KEY-----
+# cert_manager_cluster_local_ca_private_key_and_cert_secret_name: "cluster-local-ca-private-key-and-cert"
+# cert_manager_cluster_local_ca_cert_secret_name: "cluster-local-ca-cert"
+# cert_manager_cluster_local_ca_cluster_issuer_name: "cluster-local-ca-issuer"
+# cert_manager_issue_trafik_ingress_global_tls_cert: true
+# cert_manager_traefik_ingress_global_tls_cert_name: "traefik-global-tls-cert"
+# cert_manager_traefik_ingress_global_tls_cert_domains:
+#   - k3s-test.local
+
+
+# Example configuration for enabling a keepalived-based cluster load balancer for HTTP/HTTPS,
+# and PostgreSQL on port 5432.
+# This requires user-supplied IP addresses for the HTTP/HTTPS and PostgreSQL endpoints.
+
 # install_keepalived_cluster_load_balancer: true
 # cluster_load_balancer_services:
 #   - vrrp_instance_name: http_https

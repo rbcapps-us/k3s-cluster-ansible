@@ -1,0 +1,101 @@
+{% if cert_manager_cluster_local_ca_cert != "" %}
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  annotations:
+    reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+    reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+  name: {{ cert_manager_cluster_local_ca_cert_secret_name | to_yaml | trim }}
+  namespace: default
+data:
+  ca.crt: {{ cert_manager_cluster_local_ca_cert | ansible.builtin.b64encode | to_yaml | trim }}
+
+---
+
+{% if cert_manager_cluster_local_ca_private_key != "" %}
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: {{ cert_manager_cluster_local_ca_private_key_and_cert_secret_name | to_yaml | trim }}
+  namespace: cert-manager
+data:
+  tls.crt: {{ cert_manager_cluster_local_ca_cert | ansible.builtin.b64encode | to_yaml | trim }}
+  tls.key: {{ cert_manager_cluster_local_ca_private_key | ansible.builtin.b64encode | to_yaml | trim }}
+
+---
+
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ cert_manager_cluster_local_ca_cluster_issuer_name | to_yaml | trim }}
+spec:
+  ca:
+    secretName: {{ cert_manager_cluster_local_ca_private_key_and_cert_secret_name | to_yaml | trim }}
+
+---
+
+{% if cert_manager_issue_trafik_ingress_global_tls_cert %}
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ cert_manager_traefik_ingress_global_tls_cert_name | to_yaml | trim }}
+  namespace: kube-system
+spec:
+  secretName: {{ cert_manager_traefik_ingress_global_tls_cert_name | to_yaml | trim }}
+  duration: 2160h
+  renewBefore: 360h
+  privateKey:
+    algorithm: RSA
+    size: 2048
+    rotationPolicy: Always
+  usages:
+    - digital signature
+    - key encipherment
+    - server auth
+  issuerRef:
+    name: {{ cert_manager_cluster_local_ca_cluster_issuer_name | to_yaml | trim }}
+    kind: ClusterIssuer
+    group: cert-manager.io
+  dnsNames:
+{{ (cert_manager_traefik_ingress_global_tls_cert_domains + groups[k3s_hosts_group]) | to_nice_yaml(indent=2, sort_keys=false) | indent(width=4, first=true) }}
+
+---
+
+apiVersion: traefik.io/v1alpha1
+kind: TLSStore
+metadata:
+  name: default
+  namespace: kube-system
+spec:
+  defaultCertificate:
+    secretName: {{ cert_manager_traefik_ingress_global_tls_cert_name | to_yaml | trim }}
+
+---
+
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    additionalArguments:
+      - "--entrypoints.websecure.asdefault=true"
+      - "--entrypoints.websecure.http.tls=true"
+      - "--entrypoints.web.http.redirections.entrypoint.to=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=false"
+    ports:
+      web:
+        redirectTo:
+          port: websecure
+          permanent: false
+
+---
+
+{% endif %} {# if cert_manager_issue_trafik_ingress_global_tls_cert #}
+{% endif %} {# if cert_manager_cluster_local_ca_private_key != "" #}
+{% endif %} {# if cert_manager_cluster_local_ca_cert != "" #}

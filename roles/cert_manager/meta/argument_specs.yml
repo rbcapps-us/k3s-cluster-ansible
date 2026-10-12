@@ -9,3 +9,46 @@ argument_specs:
         description: 'List of extra arguments to pass to Helm when installing the cert-manager Helm chart'
         type: list
         elements: str
+      cert_manager_cluster_local_ca_cert:
+        description: |
+          The optional public certificate for the certificate authority (CA).
+          If provided, it will be used to create the CA certificate secret.
+          The CA certificate secret will be annotated to be replicated to all namespaces by the reflector.
+        type: str
+      cert_manager_cluster_local_ca_private_key:
+        description: |
+          The optional private key for the cert-manager certificate authority (CA).
+          If provided along with cert_manager_cluster_local_ca_cert, this role will create a cert-manager
+          CA secret containing these values, and a ClusterIssuer which uses it.
+        type: str
+      cert_manager_cluster_local_ca_private_key_and_cert_secret_name:
+        description: |
+          The name of the secret to create which will contain both the CA private key and certificate.
+          This secret will be created only if both the CA private key and certificate are provided.
+        type: str
+      cert_manager_cluster_local_ca_cert_secret_name:
+        description: |
+          The name of the secret to create which will contain the CA certificate.
+          This secret will be created only if the CA certificate is provided.
+        type: str
+      cert_manager_cluster_local_ca_cluster_issuer_name:
+        description: |
+          The name of the cert-manager ClusterIssuer for the CA.
+          The ClusterIssuer will be created only if both the CA private key and certificate are provided.
+        type: str
+      cert_manager_issue_trafik_ingress_global_tls_cert:
+        description: |
+          Whether to issue a global TLS certificate for the Traefik ingress.
+          If true, this also requires cert_manager_cluster_local_ca_cert and
+          cert_manager_cluster_local_ca_private_key to be provided.
+        type: bool
+      cert_manager_traefik_ingress_global_tls_cert_name:
+        description: 'The name of the global TLS certificate for the Traefik ingress'
+        type: str
+      cert_manager_traefik_ingress_global_tls_cert_domains:
+        description: |
+          The list of domains for the global TLS certificate for the Traefik ingress.
+          This will be prepended to the list of hosts in the Ansible inventory's host group,
+          in order to build the larger list of domains for the cluster-global TLS certificate.
+        type: list
+        elements: str

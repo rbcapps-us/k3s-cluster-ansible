@@ -1,2 +1,11 @@
 cert_manager_helm_chart_version: "v1.19.2"
 cert_manager_helm_extra_args: []
+
+cert_manager_cluster_local_ca_cert: ""
+cert_manager_cluster_local_ca_private_key: ""
+cert_manager_cluster_local_ca_private_key_and_cert_secret_name: "cluster-local-ca-private-key-and-cert"
+cert_manager_cluster_local_ca_cert_secret_name: "cluster-local-ca-cert"
+cert_manager_cluster_local_ca_cluster_issuer_name: "cluster-local-ca-issuer"
+cert_manager_issue_trafik_ingress_global_tls_cert: true
+cert_manager_traefik_ingress_global_tls_cert_name: "traefik-global-tls-cert"
+cert_manager_traefik_ingress_global_tls_cert_domains: []

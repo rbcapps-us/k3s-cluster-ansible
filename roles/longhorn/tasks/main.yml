@@ -116,6 +116,35 @@
       changed_when: false
       register: longhorn_htpasswd_result
 
+    - name: "Create the longhorn-system namespace, if it doesn't exist"
+      ansible.builtin.shell:
+        cmd: |
+          set -euo pipefail
+
+          echo "Checking for the existence of the longhorn-system namespace"
+          set +e
+          kubectl get namespace longhorn-system >/dev/null 2>&1
+          kubectl_get_namespace_retval="$?"
+          set -e
+
+          if [ "$kubectl_get_namespace_retval" -ne 0 ]; then
+              # Exit code 1 from kubectl get namespace indicates the namespace does not exist.
+              # Any other non-zero exit code indicates an unexpected error.
+              if [ "$kubectl_get_namespace_retval" -ne 1 ]; then
+                  echo "kubectl get namespace failed with unexpected return code $kubectl_get_namespace_retval" >&2
+                  exit "$kubectl_get_namespace_retval"
+              fi
+              echo "Creating the longhorn-system namespace"
+
+              kubectl create namespace longhorn-system
+              exit 99
+          fi
+      args:
+        executable: /bin/bash
+      register: longhorn_system_namespace_create_result
+      changed_when: "longhorn_system_namespace_create_result.rc == 99"
+      failed_when: "longhorn_system_namespace_create_result.rc not in [0, 99]"
+
     - name: "Create a temporary directory for the Longhorn ancillary resources manifest"
       ansible.builtin.tempfile:
         state: directory

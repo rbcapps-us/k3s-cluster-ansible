@@ -20,10 +20,61 @@
           - 'select((.kind == "RoleBinding" and .metadata.name == "cert-manager-startupapicheck:create-cert") | not)'
           - 'select((.kind == "ServiceAccount" and .metadata.name == "cert-manager-startupapicheck") | not)'
 
-# TODO: Allow the user to specify cert_manager_ca_key_file and cert_manager_ca_cert_file to the playbooks which call this role.
-# If these are specified, the role should use the provided CA key and certificate files to generate a CA secret and corresponding
-# ClusterIssuer which references it.  The role should also generate a CA certificate secret, containing only the public CA
-# certificate, and annotate it to be replicated to all namespaces by reflector.
-# If cert_manager_ca_key_file and cert_manager_ca_cert_file are not specified, the role should generate a self-signed CA key and
-# certificate, and use that instead, but still do all of the above steps.
-# Then, we should write another role for downloading the CA key and certificate files from the cluster's CA secret.
+    - name: "Create Cluster-Local CA secrets and optional ClusterIssuer"
+      # If we have a CA certificate, we have to run these tasks.
+      # We will only template the CA private key / certificate secret and cert-manager ClusterIssuer
+      # We will only template the CA private key / certificate secret and cert-manager ClusterIssuer
+      # if we also have cert_manager_cluster_local_ca_private_key.
+      # This logic is handled in the template.
+      when: 'cert_manager_cluster_local_ca_cert != ""'
+      block:
+
+        - name: "Create a temporary directory for the cert-manager local CA resources"
+          ansible.builtin.tempfile:
+            state: directory
+            prefix: "cert-manager-local-ca-resources"
+          register: cert_manager_local_ca_resources_tempdir
+          changed_when: false
+
+        - name: "Template and apply the cert-manager local CA resources manifest; remove the temporary directory"
+          block:
+            - name: "Template the cert-manager local CA resources manifest"
+              ansible.builtin.template:
+                src: "cert-manager-local-ca-resources.yaml.j2"
+                dest: "{{ cert_manager_local_ca_resources_tempdir.path }}/cert-manager-local-ca-resources.yaml"
+                mode: '0644'
+              changed_when: false
+
+            - name: "Apply the cert-manager local CA resources manifest"
+              become: true
+              ansible.builtin.shell:
+                cmd: |
+                  set -euo pipefail
+
+                  set +e
+                  kubectl diff -f {{ cert_manager_local_ca_resources_tempdir.path | quote }}/cert-manager-local-ca-resources.yaml
+                  kubectl_diff_retval="$?"
+                  set -e
+
+                  if [ "$kubectl_diff_retval" -ne 0 ]; then
+                      # Exit code 1 from kubectl diff indicates differences were found.
+                      # Any other non-zero exit code indicates an unexpected error.
+                      if [ "$kubectl_diff_retval" -ne 1 ]; then
+                          echo "kubectl diff failed with unexpected return code $kubectl_diff_retval" >&2
+                          exit "$kubectl_diff_retval"
+                      fi
+                      kubectl apply -f {{ cert_manager_local_ca_resources_tempdir.path | quote }}/cert-manager-local-ca-resources.yaml
+                      exit 99
+                  fi
+              args:
+                executable: /bin/bash
+              register: cert_manager_local_ca_resources_apply_result
+              changed_when: "cert_manager_local_ca_resources_apply_result.rc == 99"
+              failed_when: "cert_manager_local_ca_resources_apply_result.rc not in [0, 99]"
+
+          always:
+            - name: "Remove the temporary directory for the cert-manager local CA resources manifest"
+              ansible.builtin.file:
+                path: "{{ cert_manager_local_ca_resources_tempdir.path }}"
+                state: absent
+              changed_when: false
