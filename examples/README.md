@@ -191,7 +191,7 @@ In an integrated environment where you are using an Amazon Web Services ACM Priv
 
 ### Test mounting the CA certificate in a pod
 
-Back on your laptop, copy the `` file to the first node in the cluster:
+Back on your laptop, copy the `busybox-pod-with-cluster-local-ca-cert.yaml` Kubernetes manifest file to the first node in the cluster:
 ```sh
 scp -p busybox-pod-with-cluster-local-ca-cert.yaml k3s-test-01.local:/tmp/
 ```
@@ -231,17 +231,19 @@ rm -f /tmp/busybox-pod-with-cluster-local-ca-cert.yaml
 
 To get an idea of how secret mounting works, have a look at the contents of the [busybox-pod-with-cluster-local-ca-cert.yaml](busybox-pod-with-cluster-local-ca-cert.yaml) YAML manifest which we just tested.
 
-When using a `subPath` mount to mount Kubernetes secrets, it is necessary to annotate the manifest to cause Stakater Reloader to do a rolling update on the pods whenever a mounted secret changes.  If you set `install_stakater_reloader` to true, Stakater Reloader will be installed on the cluster, and can be used to do rolling updates of pods when a mounted secret is updated.  This is accomplished by adding a `reloader.stakater.com/auto: "true"` annotation to a resource (Deployment, StatefulSet, DaemonSet, ReplicaSet, etc.) which creates pods.  See [Stakater Reloader GitHub](https://github.com/stakater/reloader) for documentation.
+When using a `subPath` mount to mount Kubernetes secrets, it is necessary to annotate the manifest to cause Stakater Reloader to do a rolling update on the pods whenever a mounted secret changes.  This is accomplished by adding a `reloader.stakater.com/auto: "true"` annotation to a resource (Deployment, StatefulSet, DaemonSet, ReplicaSet, etc.) which creates pods.  See [Stakater Reloader GitHub](https://github.com/stakater/reloader) for documentation.
 
-## Custer Load Balancer with TLS
+If you set `install_stakater_reloader` to true, Stakater Reloader will be installed on the cluster, and can be used to do rolling updates of pods when a mounted secret is updated.
+
+## Cluster Load Balancer
 
 *This section is OPTIONAL, and requires a static IP address on your local network.*
 
-Now that we have TLS working on the clsuter, we can configure the cluster load balancer, to enable accessing the cluster via a single IP address and corresponding hostname.
+Now that we (optionaly) have TLS working on the cluster, we can configure the cluster load balancer, to enable accessing the cluster's HTTP/HTTPS services via a single IP address and corresponding hostname.
 
-The four hostnames `k3s-test.local`, `k3s-test-01.local`, `k3s-test-02.local`, and `k3s-test-03.local` must resolve on clients to reachable cluster ingress addresses, with ports 80 and 443 accessible.  A certificate does not create DNS records.  In particular, configure `k3s-test.local` to resolve to a server or the cluster load-balancer address.  `.local` uses multicast DNS on many systems; for a real intranet, use names under an internal DNS domain controlled by your organization instead, and adjust the certificate names accordingly.
+The four hostnames `k3s-test.local`, `k3s-test-01.local`, `k3s-test-02.local`, and `k3s-test-03.local` must resolve on clients to reachable cluster ingress addresses, with ports 80 and 443 accessible.  The nodes in the test cluster (comprised of UTM VMs) are running avahi-daemon to ensure that their hostnames are resolvable on the local network via DNS.  So we just need to configure `k3s-test.local` to resolve to the cluster load balancer's IP address.
 
-That said, in a local development environment on MacOS `avahi-daemon` will cause the three nodes of the cluster to resolve correctly in DNS.  Because of this, you should only need to get `k3s-test.local` resolving correctly.
+For a real intranet, use names under an internal DNS domain controlled by your organization instead, and adjust the certificate names accordingly.
 
 The `k3s-test.local` domain will need to resolve to a free, unused IP address in your local network.  This IP address will need to be outside of the range of any DHCP server running on your local network (in other words, a static IP address).  For our example, we will use `192.168.64.153`, but this will be different for your internal network, so be sure to replace it with your IP address in all of the commands below.
 
