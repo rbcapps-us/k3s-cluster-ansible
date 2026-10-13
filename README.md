@@ -79,9 +79,9 @@ Validate playbooks and roles for lint errors:
 
 * Create and push a git tag with the same version as the collection version (replace 1.0.0 with the correct version everywhere in the commands below):
     ```sh
-    git tag -a v1.0.0 -m "Release version 1.0.0"
+    git tag v1.0.0
     git push origin v1.0.0
-    ``` 
+    ```
 * In GitHub, create a release from the new tag.  Upload the newly built tarball to the new release.
 
 ## Known, Unhandled Edge Cases
