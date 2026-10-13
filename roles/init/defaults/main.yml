@@ -1,6 +1,6 @@
 superuser_name: ""
 
-k3s_hosts_group: "all_hosts"
+k3s_hosts_group: "k3s_nodes"
 k3s_storage_dir: ""
 
 kube_api_user: k3s
