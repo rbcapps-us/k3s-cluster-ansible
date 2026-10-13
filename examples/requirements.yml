@@ -1,4 +1,4 @@
 collections:
-  - name: https://github.com/roncemer/k3s-cluster-ansible
+  - name: https://github.com/rbcapps-us/k3s-cluster-ansible
     type: git
     version: main

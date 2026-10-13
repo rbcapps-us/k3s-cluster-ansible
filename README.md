@@ -1,4 +1,4 @@
-# Ansible Collection - roncemer.k3s_cluster_ansible
+# Ansible Collection - rbcapps_us.k3s_cluster_ansible
 
 A no-nonsense Ansible collection to easily provision or upgrade a K3s cluster.
 
@@ -23,11 +23,11 @@ This guide covers preparing three UTM virtual machines on macOS and walking thro
 
 Copy the *examples* directory to a new directory outside of this project.
 
-Modify the requirements.yml to use a production tag of the *roncemer.k3s_cluster_ansible* Galaxy collection.
+Modify the requirements.yml to use a production tag of the *rbcapps_us.k3s_cluster_ansible* Galaxy collection.
 
-Remove any non-production copy of the *roncemer.k3s_cluster_ansible* collection, and reinstall the configured version:
+Remove any non-production copy of the *rbcapps_us.k3s_cluster_ansible* collection, and reinstall the configured version:
 ```sh
-rm -rf ~/.ansible/collections/ansible_collections/roncemer/k3s_cluster_ansible
+rm -rf ~/.ansible/collections/ansible_collections/rbcapps_us/k3s_cluster_ansible
 ansible-galaxy install -r requirements.yml
 ```
 
@@ -37,12 +37,12 @@ Create a file named *inventories/k3s-test-cluster/ansible-become-password.txt*, 
 
 This collection contains the following playbooks:
 
-* [roncemer.k3s_cluster_ansible.setup_k3s_cluster](../playbooks/setup_k3s_cluster.yml): Builds out a K3s cluster across the nodes (hosts) in the inventory.
-* [roncemer.k3s_cluster_ansible.headlamp_token](../playbooks/headlamp_token.yml): Creates a new token for logging into the Headlamp dashboard.
-* [roncemer.k3s_cluster_ansible.uninstall_k3s](../playbooks/uninstall_k3s.yml): Uninstalls k3s from all nodes (hosts) in the inventory.
-* [roncemer.k3s_cluster_ansible.alive_check](../playbooks/alive_check.yml): Confirms that all nodes are alive and reachable.
-* [roncemer.k3s_cluster_ansible.reboot](../playbooks/reboot.yml): Reboots all nodes.
-* [roncemer.k3s_cluster_ansible.shutdown](../playbooks/shutdown.yml): Shuts down all nodes.
+* [rbcapps_us.k3s_cluster_ansible.setup_k3s_cluster](../playbooks/setup_k3s_cluster.yml): Builds out a K3s cluster across the nodes (hosts) in the inventory.
+* [rbcapps_us.k3s_cluster_ansible.headlamp_token](../playbooks/headlamp_token.yml): Creates a new token for logging into the Headlamp dashboard.
+* [rbcapps_us.k3s_cluster_ansible.uninstall_k3s](../playbooks/uninstall_k3s.yml): Uninstalls k3s from all nodes (hosts) in the inventory.
+* [rbcapps_us.k3s_cluster_ansible.alive_check](../playbooks/alive_check.yml): Confirms that all nodes are alive and reachable.
+* [rbcapps_us.k3s_cluster_ansible.reboot](../playbooks/reboot.yml): Reboots all nodes.
+* [rbcapps_us.k3s_cluster_ansible.shutdown](../playbooks/shutdown.yml): Shuts down all nodes.
 
 ## Playbook Defaults
 
@@ -73,7 +73,7 @@ Validate playbooks and roles for lint errors:
     ```
 * Publish the collection, either by CLI:
     ```sh
-    ansible-galaxy collection publish roncemer-k3s_cluster_ansible-1.0.0.tar.gz --api-key <ansible-galaxy-token-goes-here>
+    ansible-galaxy collection publish rbcapps_us-k3s_cluster_ansible-1.0.0.tar.gz --api-key <ansible-galaxy-token-goes-here>
     ```
   or by going to [https://galaxy.ansible.com/ui/my-namespaces/](https://galaxy.ansible.com/ui/my-namespaces/), clicking *View collections* under the correct namespace, clicking *Upload collection*, and selecting the collection tarball.
 
@@ -90,4 +90,4 @@ Upgrading a single-node cluster to a different K3s version, while simultaneously
 
 ## Where to go from here?
 
-Have a look at the [k3s-apps-ansible](https://github.com/roncemer/k3s-apps-ansible) project, which provides Ansible playbooks for installing various applications to a K3s cluster which was provisioned using the `k3s-cluster-ansible` Galaxy collection.
+Have a look at the [k3s-apps-ansible](https://github.com/rbcapps-us/k3s-apps-ansible) project, which provides Ansible playbooks for installing various applications to a K3s cluster which was provisioned using the `k3s-cluster-ansible` Galaxy collection.
