@@ -37,6 +37,7 @@
           - /dev/longhorn
           - /var/lib/longhorn
           - '{{ superuser_home }}/.kube'
+          - '{{ kube_api_user_home }}/.kube'
 
     - name: "Append directories under {{ k3s_storage_dir }} to uninstall_k3s_dirs_and_files_to_remove fact"
       when: 'k3s_storage_dir != ""'
@@ -54,11 +55,6 @@
         path: "{{ item }}"
         state: absent
       loop: '{{ uninstall_k3s_dirs_and_files_to_remove }}'
-
-    - name: "Remove the {{ kube_api_user_home }}.kube directory"
-      ansible.builtin.file:
-        path: "{{ kube_api_user_home }}/.kube"
-        state: absent
 
     - name: "Attempt to remove empty directories"
       ansible.builtin.shell:
