@@ -1,6 +1,7 @@
 - name: "Create a Headlamp token"
   run_once: true
   become: true
+  become_user: "{{ kube_api_user }}"
   ansible.builtin.shell:
     cmd: |
       set -euo pipefail
