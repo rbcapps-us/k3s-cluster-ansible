@@ -6,3 +6,5 @@
       tags: [always]
     - role: uninstall_k3s
       tags: [uninstall, uninstall_k3s]
+    - role: keepalived_cluster_load_balancer_uninstall
+      tags: [uninstall, keepalived_cluster_load_balancer_uninstall, uninstall_keepalived_cluster_load_balancer]
