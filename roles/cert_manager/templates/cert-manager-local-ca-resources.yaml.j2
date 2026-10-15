@@ -45,19 +45,19 @@ metadata:
   namespace: kube-system
 spec:
   secretName: {{ cert_manager_traefik_ingress_global_tls_cert_name | to_yaml | trim }}
-  duration: 2160h
-  renewBefore: 360h
+  duration: 2160h # 90 days
+  renewBefore: 360h # 15 days
   privateKey:
     algorithm: RSA
-    size: 2048
+    size: 4096
     rotationPolicy: Always
   usages:
     - digital signature
     - key encipherment
     - server auth
   issuerRef:
-    name: {{ cert_manager_cluster_local_ca_cluster_issuer_name | to_yaml | trim }}
     kind: ClusterIssuer
+    name: {{ cert_manager_cluster_local_ca_cluster_issuer_name | to_yaml | trim }}
     group: cert-manager.io
   dnsNames:
 {{ (cert_manager_traefik_ingress_global_tls_cert_domains + groups[k3s_hosts_group]) | to_nice_yaml(indent=2, sort_keys=false) | indent(width=4, first=true) }}
