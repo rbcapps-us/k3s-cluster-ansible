@@ -64,7 +64,7 @@
 
             - name: "Move the CNI plugins into place"
               ansible.builtin.command:
-                cmd: 'mv -f "{{ (cni_plugins_tempdir.path + "/" + item) | quote }}" "{{ (cni_plugins_bin_dir + "/" + item) | quote }}"'
+                cmd: 'mv -f {{ (cni_plugins_tempdir.path + "/" + item) | quote }} {{ (cni_plugins_bin_dir + "/" + item) | quote }}'
               loop: "{{ cni_plugins_needed_plugins }}"
               changed_when: true
 
