@@ -54,7 +54,7 @@
         "${var_args[@]}" \
       {% if (helm_diff_yq_filter_expressions | length) > 0 %}
       {% for helm_diff_exclude_yq_expression in helm_diff_yq_filter_expressions %}
-            | yq {{ helm_diff_exclude_yq_expression | quote }} - --yaml-output \
+            | yq --yaml-output --yaml-roundtrip {{ helm_diff_exclude_yq_expression | quote }} - \
       {% endfor %}
             | sed -e 's/^--- null$//g' \
       {% endif %}
