@@ -10,21 +10,15 @@
       tags: [k3s, k3s_cluster]
     - role: helm
       tags: [helm]
-    - role: longhorn
-      tags: [longhorn]
-      when: install_longhorn
-    - role: headlamp
-      tags: [headlamp, install_headlamp]
-      when: install_headlamp
-    - role: whereabouts
-      tags: [whereabouts]
-      when: install_whereabouts_ipam_plugin
     - role: cni_plugins
       tags: [cni_plugins]
       when: install_cni_plugins
     - role: multus_cni
       tags: [multus_cni]
       when: install_multus_cni
+    - role: whereabouts
+      tags: [whereabouts]
+      when: install_whereabouts_ipam_plugin
     - role: reflector
       tags: [reflector]
       when: install_emberstack_kubernetes_secrets_reflector
@@ -37,6 +31,12 @@
     - role: keepalived_cluster_load_balancer
       tags: [keepalived_cluster_load_balancer]
       when: install_keepalived_cluster_load_balancer
+    - role: longhorn
+      tags: [longhorn]
+      when: install_longhorn
+    - role: headlamp
+      tags: [headlamp, install_headlamp]
+      when: install_headlamp
     - role: headlamp_token
       tags: [headlamp, headlamp_token]
       when: install_headlamp
