@@ -33,7 +33,7 @@ longhorn_ui_credentials:
 # cert_manager_cluster_local_ca_cert_secret_name: "cluster-local-ca-cert"
 # cert_manager_cluster_local_ca_cluster_issuer_name: "cluster-local-ca-issuer"
 # cert_manager_issue_trafik_ingress_global_tls_cert: true
-# cert_manager_traefik_ingress_global_tls_cert_name: "traefik-global-tls-cert"
+# cert_manager_traefik_ingress_global_tls_cert_name: "cluster-tls-cert"
 # cert_manager_traefik_ingress_global_tls_cert_domains:
 #   - k3s-test.local
 
