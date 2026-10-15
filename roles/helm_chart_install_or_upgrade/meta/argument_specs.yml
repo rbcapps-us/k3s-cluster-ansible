@@ -30,7 +30,7 @@ argument_specs:
         type: str
         required: true
       helm_repo_name:
-        description: 'The repository name for the Helm chart'
+        description: 'The repository name for the Helm chart.  This is only used if helm_chart_url is not an OCI URL.'
         type: str
         required: true
       helm_chart_name:
