@@ -1,0 +1,55 @@
+- name: "Uninstall the Keepalived cluster load balancer"
+  become: true
+  become_user: "{{ superuser_name }}"
+  block:
+    - name: "Find all externally-managed keepalived config files in /etc/keepalived/conf.d"
+      ansible.builtin.find:
+        paths: "/etc/keepalived/conf.d"
+        patterns: "*.conf"
+        excludes: "k3s-*.conf"
+      register: externally_managed_keepalived_existing_conf_files
+
+    - name: "Find all k3s-managed keepalived config files in /etc/keepalived/conf.d"
+      ansible.builtin.find:
+        paths: "/etc/keepalived/conf.d"
+        patterns: "k3s-*.conf"
+      register: k3s_managed_keepalived_existing_conf_files
+
+    - name: "Delete all existing k3s-managed keepalived config files; restart keepalived if there are any externally-managed keepalived config files in /etc/keepalived/conf.d"
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ k3s_managed_keepalived_existing_conf_files.files }}"
+      notify: "{{ conditional_restart_notify | default(omit, true) }}"
+      vars:
+        conditional_restart_notify: '{{ "Restart keepalived" if (externally_managed_keepalived_existing_conf_files | length) > 0 else none }}'
+
+    - name: "Flush handlers"
+      ansible.builtin.meta: flush_handlers
+
+    - name: "Stop, disable, and uninstall keeaplived if there are no externally-managed keepalived config files"
+      when: externally_managed_keepalived_existing_conf_files.files | length == 0
+      block:
+        - name: "Gather service facts"
+          ansible.builtin.service_facts:
+
+        - name: "Stop and disable keepalived"
+          when:
+            - (cluster_load_balancer_services | length) == 0
+            - '"keepalived.service" in ansible_facts.services'
+          ansible.builtin.service:
+            name: keepalived
+            state: stopped
+            enabled: false
+
+        - name: "Uninstall keepalived"
+          ansible.builtin.package:
+            name:
+              - keepalived
+            state: absent
+            update_cache: true
+
+        - name: "Remove the /etc/keepalived directory"
+          ansible.builtin.file:
+            path: "/etc/keepalived"
+            state: absent

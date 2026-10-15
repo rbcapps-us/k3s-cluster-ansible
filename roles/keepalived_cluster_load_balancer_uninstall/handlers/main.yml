@@ -1,0 +1,6 @@
+- name: "Restart keepalived"
+  become: true
+  become_user: "{{ superuser_name }}"
+  ansible.builtin.service:
+    name: keepalived
+    state: restarted
