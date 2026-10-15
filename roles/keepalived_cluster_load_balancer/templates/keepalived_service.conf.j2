@@ -16,7 +16,7 @@ virtual_server {{ current_lb_service.ip_address }} {{ port.port_number }} {
     lb_kind NAT
     protocol TCP
 
-{% for host in groups["k3s_nodes"] %}
+{% for host in groups[k3s_hosts_group] %}
     real_server {{ hostvars[host]['ansible_default_ipv4']['address'] }} {{ port.port_number }} {
         weight 1
 {% if port.health_check_protocol == 'http' or port.health_check_protocol == 'https' %}
