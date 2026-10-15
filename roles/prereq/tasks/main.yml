@@ -51,7 +51,7 @@
 # CREATE THE GROUP AND USER WHICH CAN ACCESS THE KUBERNETES API #
 #################################################################
 
-- name: "Create the {{ kube_api_group }} group with gid {{ kube_api_group_id }} if this is a server node"
+- name: 'Create the {{ kube_api_group }} group{{ (" with gid " + (kube_api_group_id | string)) if kube_api_group_id is not none else "" }} if this is a server node'
   when: 'node_k3s_role == "server"'
   become: true
   ansible.builtin.group:
@@ -59,7 +59,7 @@
     gid: '{{ kube_api_group_id }}'
     state: present
 
-- name: "Create the {{ kube_api_user }} user with uid {{ kube_api_user_id }} if this is a server node, and the option to create the ks user is enabled"
+- name: 'Create the {{ kube_api_user }} user{{ (" with uid " + (kube_api_user_id | string)) if kube_api_user_id is not none else "" }} if this is a server node, and the option to create the ks user is enabled'
   when: 'node_k3s_role == "server"'
   become: true
   ansible.builtin.user:
