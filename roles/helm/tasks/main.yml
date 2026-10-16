@@ -1,66 +1,67 @@
-- name: "Check for Helm installation"
-  ansible.builtin.shell:
-    cmd: |
-      set -euo pipefail
-
-      if [ ! -x /usr/local/bin/helm ]; then
-          echo "NEED_INSTALL"
-      else
-          helm_version=$(helm version --short | cut -f1 -d"+")
-          if [ "$helm_version" != {{ helm_version | quote }} ]; then
-              echo "NEED_INSTALL"
-          fi
-      fi
-  args:
-    executable: /bin/bash
-  register: helm_check_installed_result
-  failed_when: false
-  changed_when: false
-
-- name: "Download, extract, and install Helm"
-  when: '(helm_check_installed_result.stdout | trim) == "NEED_INSTALL"'
+- name: "Install Helm, if needed"
+  when: 'node_k3s_role == "server"'
   block:
+    - name: "Check for Helm installation"
+      ansible.builtin.shell:
+        cmd: |
+          set -euo pipefail
 
-    - name: "Create a unique temporary directory for the Helm download"
-      when: 'node_k3s_role == "server"'
-      ansible.builtin.tempfile:
-        state: directory
-        prefix: "helm_dl_"
-      register: helm_download_tempdir
+          if [ ! -x /usr/local/bin/helm ]; then
+              echo "NEED_INSTALL"
+          else
+              helm_version=$(helm version --short | cut -f1 -d"+")
+              if [ "$helm_version" != {{ helm_version | quote }} ]; then
+                  echo "NEED_INSTALL"
+              fi
+          fi
+      args:
+        executable: /bin/bash
+      register: helm_check_installed_result
+      failed_when: false
       changed_when: false
 
-    - name: "Download and install Helm; remove the temporary directory"
-      when: 'node_k3s_role == "server"'
+    - name: "Download, extract, and install Helm"
+      when: '(helm_check_installed_result.stdout | trim) == "NEED_INSTALL"'
       block:
 
-        - name: "Download the Helm tarball"
-          ansible.builtin.get_url:
-            url: "{{ helm_download_url }}"
-            dest: '{{ helm_download_tempdir.path }}/{{ helm_download_filename }}'
-            mode: '0644'
+        - name: "Create a unique temporary directory for the Helm download"
+          ansible.builtin.tempfile:
+            state: directory
+            prefix: "helm_dl_"
+          register: helm_download_tempdir
           changed_when: false
 
-        - name: "Extract the Helm tarball"
-          ansible.builtin.unarchive:
-            src: '{{ helm_download_tempdir.path }}/{{ helm_download_filename }}'
-            dest: '{{ helm_download_tempdir.path }}'
-            remote_src: true
-          changed_when: false
+        - name: "Download and install Helm; remove the temporary directory"
+          block:
 
-        - name: "Move the helm executable into place"
-          become: true
-          ansible.builtin.shell:
-            cmd: |
-              set -euo pipefail
+            - name: "Download the Helm tarball"
+              ansible.builtin.get_url:
+                url: "{{ helm_download_url }}"
+                dest: '{{ helm_download_tempdir.path }}/{{ helm_download_filename }}'
+                mode: '0644'
+              changed_when: false
 
-              mv -f {{ (helm_download_tempdir.path + "/linux-" + helm_arch + "/helm") | quote }} /usr/local/bin/helm
-          args:
-            executable: /bin/bash
-          changed_when: true
+            - name: "Extract the Helm tarball"
+              ansible.builtin.unarchive:
+                src: '{{ helm_download_tempdir.path }}/{{ helm_download_filename }}'
+                dest: '{{ helm_download_tempdir.path }}'
+                remote_src: true
+              changed_when: false
 
-      always:
-        - name: "Remove the temporary directory for the Helm download"
-          ansible.builtin.file:
-            path: "{{ helm_download_tempdir.path }}"
-            state: absent
-          changed_when: false
+            - name: "Move the helm executable into place"
+              become: true
+              ansible.builtin.shell:
+                cmd: |
+                  set -euo pipefail
+
+                  mv -f {{ (helm_download_tempdir.path + "/linux-" + helm_arch + "/helm") | quote }} /usr/local/bin/helm
+              args:
+                executable: /bin/bash
+              changed_when: true
+
+          always:
+            - name: "Remove the temporary directory for the Helm download"
+              ansible.builtin.file:
+                path: "{{ helm_download_tempdir.path }}"
+                state: absent
+              changed_when: false
