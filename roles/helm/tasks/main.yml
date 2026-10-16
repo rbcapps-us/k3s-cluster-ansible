@@ -11,12 +11,14 @@
               echo "NEED_INSTALL"
           fi
       fi
-  register: helm_check
+  args:
+    executable: /bin/bash
+  register: helm_check_installed_result
   failed_when: false
   changed_when: false
 
 - name: "Download, extract, and install Helm"
-  when: '(helm_check.stdout | trim) == "NEED_INSTALL"'
+  when: '(helm_check_installed_result.stdout | trim) == "NEED_INSTALL"'
   block:
 
     - name: "Create a unique temporary directory for the Helm download"
