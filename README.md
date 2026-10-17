@@ -90,4 +90,4 @@ Upgrading a single-node cluster to a different K3s version, while simultaneously
 
 ## Where to go from here?
 
-Have a look at the [k3s-apps-ansible](https://github.com/rbcapps-us/k3s-apps-ansible) project, which provides Ansible playbooks for installing various applications to a K3s cluster which was provisioned using the `k3s-cluster-ansible` Galaxy collection.
+Have a look at the [k3s-cloud-native-pg-ansible](https://github.com/rbcapps-us/k3s-cloud-native-pg-ansible) project, which provides Ansible playbooks for installing CloudNativePG high-availability PostgreSQL to a K3s cluster which was provisioned using the `rbcapps_us.k3s_cluster_ansible` Galaxy collection.
