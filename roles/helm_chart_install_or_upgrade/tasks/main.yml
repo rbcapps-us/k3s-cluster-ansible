@@ -58,7 +58,7 @@
       {% endfor %}
             | sed -e 's/^--- null$//g' \
       {% endif %}
-            | kubectl diff -f - 2>&1
+            | kubectl diff --namespace {{ helm_namespace | quote }} -f - 2>&1
       helm_template_kubectl_diff_retval="$?"
       set -e
 
