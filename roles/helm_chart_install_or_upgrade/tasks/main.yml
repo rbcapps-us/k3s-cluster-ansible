@@ -52,12 +52,9 @@
         --namespace {{ helm_namespace | quote }} \
         --version {{ helm_chart_version | quote }} \
         "${var_args[@]}" \
-      {% if (helm_diff_yq_filter_expressions | length) > 0 %}
       {% for helm_diff_exclude_yq_expression in helm_diff_yq_filter_expressions %}
-            | yq --yaml-output --yaml-roundtrip {{ helm_diff_exclude_yq_expression | quote }} - \
+            | yq --yaml-output --yaml-roundtrip {{ helm_diff_exclude_yq_expression | quote }} - | sed -e 's/^--- null$//g' \
       {% endfor %}
-            | sed -e 's/^--- null$//g' \
-      {% endif %}
             | kubectl diff --namespace {{ helm_namespace | quote }} -f - 2>&1
       helm_template_kubectl_diff_retval="$?"
       set -e
