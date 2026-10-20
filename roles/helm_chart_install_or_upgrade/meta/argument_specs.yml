@@ -50,8 +50,20 @@ argument_specs:
         type: list
         elements: str
         required: true
+      helm_diff_kustomize_patches_yaml:
+        description: |
+            The patches: section of a kustomization.yaml file to apply to the Helm-generated template before performing the
+            kubectl diff.  This must be a valid YAML snippet containing only list items under the patches: key.
+            Note that Kustomize is preferred over YQ, because YQ can do unexpected things, including changing the base for octal
+            integers from octal to decimal without performing the actual mathematical conversion.
+            Optional.  Defaults to an empty string.
+        type: str
+        required: false
       helm_diff_yq_filter_expressions:
-        description: 'YQ expressions to select which resource(s) from the Helm-generated template will be included in the kubectl diff when determining whether the Helm chart needs to be upgraded'
+        description: |
+            YQ expressions to select which resource(s) from the Helm-generated template will be included in the kubectl diff when
+            determining whether the Helm chart needs to be upgraded.
+            Optional.  Defaults to an empty list.
         type: list
         elements: str
         required: false

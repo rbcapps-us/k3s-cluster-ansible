@@ -1,85 +1,143 @@
 - name: "Install or upgrade {{ helm_release_name }} via its Helm chart"
   run_once: true
-  ansible.builtin.shell:
-    cmd: |
-      set -euo pipefail
+  become: true
+  become_user: "{{ kube_api_user }}"
+  block:
 
-      var_args=()
-      {% for arg in helm_args %}
-      var_args+=({{ arg | quote }})
-      {% endfor %}
+    - name: "Create a temporary work directory for helm and kubectl to do their work"
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: helm_kubectl
+      register: helm_kubectl_k3s_clsuter_ansible_tempdir
+      changed_when: false
 
-      {% if not helm_chart_url.startswith('oci://') %}
-      set +e
-      # Determine whether the Helm repository needs to be added; if so, add it.
-      printf "Determining whether the %s helm repository needs to be added\n" {{ helm_repo_name | quote }}
-      if ! helm repo list | grep -q {{ ('^' + helm_repo_name + '\s') | quote }}; then
-          printf "Adding the helm repository: %s\n" {{ helm_repo_name | quote }}
-          helm repo add {{ helm_repo_name | quote }} {{ helm_chart_url | quote }}
-      fi
-      set -e
+    - name: "Install or upgrade {{ helm_release_name }} via its Helm chart"
+      block:
+        - name: "Build the kustomization.yaml file, if needed"
+          when: helm_diff_kustomize_patches_yaml != ""
+          ansible.builtin.copy:
+            dest: "{{ helm_kubectl_k3s_clsuter_ansible_tempdir.path }}/kustomization.yaml"
+            content: |
+              apiVersion: kustomize.config.k8s.io/v1beta1
+              kind: Kustomization
+              resources:
+                - {{ (helm_kubectl_k3s_clsuter_ansible_tempdir.path + "/helm-template.yaml") | to_yaml | trim }}
+              patches:
+              {{ helm_diff_kustomize_patches_yaml | from_yaml | to_nice_yaml(indent=2, sort_keys=false) | indent(width=2, first=true) }}
+          changed_when: false
 
-      echo "Updating Helm repositories."
-      helm repo update
-      {% endif %}
+        - name: "Install or upgrade {{ helm_release_name }} via its Helm chart"
+          ansible.builtin.shell:
+            cmd: |
+              set -euo pipefail
 
-      set +e
-      # Determine whether the release is already installed.
-      printf "Determining whether the %s release is already installed\n" {{ helm_release_name | quote }}
-      helm --namespace {{ helm_namespace | quote }} status {{ helm_release_name | quote }} >/dev/null 2>&1
-      helm_status_retval="$?"
-      set -e
+              var_args=()
+              {% for arg in helm_args %}
+              var_args+=({{ arg | quote }})
+              {% endfor %}
 
-      # If the release is not installed, install it and exit with a special code to indicate a change.
-      if [ "$helm_status_retval" -ne 0 ]; then
-          printf "Installing the %s release via the Helm chart\n" {{ helm_release_name | quote }}
-          helm install {{ helm_release_name | quote }} {{ helm_chart_ref | quote }} \
-              --namespace {{ helm_namespace | quote }} \
-              --version {{ helm_chart_version | quote }} \
-              "${var_args[@]}"
-          exit 99
-      fi
+              {% if not helm_chart_url.startswith('oci://') %}
+              set +e
+              # Determine whether the Helm repository needs to be added; if so, add it.
+              printf "Determining whether the %s helm repository needs to be added\n" {{ helm_repo_name | quote }}
+              if ! helm repo list | grep -q '^'{{ helm_repo_name | quote }}'\s'; then
+                  printf "Adding the helm repository: %s\n" {{ helm_repo_name | quote }}
+                  helm repo add {{ helm_repo_name | quote }} {{ helm_chart_url | quote }}
+              fi
+              set -e
 
-      set +e
-      printf "Determining the installed Helm chart version of the %s release\n" {{ helm_release_name | quote }}
-      installed_helm_chart_version=$(helm -n {{ helm_namespace | quote }} list --selector name={{ helm_release_name | quote }} -o json | jq -r '.[] | .chart' | sed -e 's/^'{{ helm_chart_name | quote }}'-//g')
-      echo "Installed Helm chart version: ${installed_helm_chart_version}"
-      set -e
+              echo "Updating Helm repositories."
+              helm repo update
+              {% endif %}
 
-      set +e
-      printf "Determining whether a helm upgrade for the %s release would result in any changes\n" {{ helm_release_name | quote }}
-      helm template {{ helm_release_name | quote }} {{ helm_chart_ref | quote }} \
-        --namespace {{ helm_namespace | quote }} \
-        --version {{ helm_chart_version | quote }} \
-        "${var_args[@]}" \
-      {% for helm_diff_exclude_yq_expression in helm_diff_yq_filter_expressions %}
-            | yq --yaml-output --yaml-roundtrip {{ helm_diff_exclude_yq_expression | quote }} - | sed -e 's/^--- null$//g' \
-      {% endfor %}
-            | kubectl diff --namespace {{ helm_namespace | quote }} -f - 2>&1
-      helm_template_kubectl_diff_retval="$?"
-      set -e
+              set +e
+              # Determine whether the release is already installed.
+              printf "Determining whether the %s release is already installed\n" {{ helm_release_name | quote }}
+              helm --namespace {{ helm_namespace | quote }} status {{ helm_release_name | quote }} >/dev/null 2>&1
+              helm_status_retval="$?"
+              set -e
 
-      if [ "$helm_template_kubectl_diff_retval" -ne 0 ] && [ "$helm_template_kubectl_diff_retval" -ne 1 ]; then
-        # Exit code 1 from kubectl diff indicates differences were found.
-        # Any other non-zero exit code indicates an unexpected error.
-          echo "Helm template and kubectl diff failed with unexpected return code $helm_template_kubectl_diff_retval" >&2
-          exit "$helm_template_kubectl_diff_retval"
-      fi
+              # If the release is not installed, install it and exit with a special code to indicate a change.
+              if [ "$helm_status_retval" -ne 0 ]; then
+                  printf "Installing the %s release via the Helm chart\n" {{ helm_release_name | quote }}
+                  helm install {{ helm_release_name | quote }} {{ helm_chart_ref | quote }} \
+                      --namespace {{ helm_namespace | quote }} \
+                      --version {{ helm_chart_version | quote }} \
+                      "${var_args[@]}"
+                  exit 99
+              fi
 
-      if [ "$installed_helm_chart_version" != {{ helm_chart_version | quote }} ] || [ "$helm_template_kubectl_diff_retval" -ne 0 ]; then
-          printf "Upgrading the %s release via the Helm chart\n" {{ helm_release_name | quote }}
-          helm upgrade {{ helm_release_name | quote }} {{ helm_chart_ref | quote }} \
-              --namespace {{ helm_namespace | quote }} \
-              --version {{ helm_chart_version | quote }} \
-              "${var_args[@]}"
-          exit 99
-      else
-          printf "Helm release %s is already up-to-date\n" {{ helm_release_name | quote }}
-      fi
-  args:
-    executable: /bin/bash
-  vars:
-    helm_chart_ref: '{{ (helm_chart_url if helm_chart_url.startswith("oci://") else (helm_repo_name + "/" + helm_chart_name)) }}'
-  register: helm_chart_install_or_upgrade_result
-  changed_when: 'helm_chart_install_or_upgrade_result.rc == 99'
-  failed_when: 'helm_chart_install_or_upgrade_result.rc not in [0, 99]'
+              need_upgrade=n
+
+              set +e
+              printf "Determining the installed Helm chart version of the %s release\n" {{ helm_release_name | quote }}
+              installed_helm_chart_version=$(helm -n {{ helm_namespace | quote }} list --selector name={{ helm_release_name | quote }} -o json | jq -r '.[] | .chart' | sed -e 's/^'{{ helm_chart_name | quote }}'-//g')
+              echo "Installed Helm chart version: ${installed_helm_chart_version}"
+              set -e
+
+              if [ "$installed_helm_chart_version" != {{ helm_chart_version | quote }} ]; then
+                  echo "Helm chart version mismatch detected. Upgrade needed."
+                  need_upgrade=y
+              else
+                  printf "Determining whether a helm upgrade for the %s release would result in any changes\n" {{ helm_release_name | quote }}
+
+                  tempdir={{ helm_kubectl_k3s_clsuter_ansible_tempdir.path | quote }}
+
+                  helm template {{ helm_release_name | quote }} {{ helm_chart_ref | quote }} \
+                    --namespace {{ helm_namespace | quote }} \
+                    --version {{ helm_chart_version | quote }} \
+                    "${var_args[@]}" \
+                    > "$tempdir/helm-template.yaml"
+                  kubectl_diff_src_file="$tempdir/helm-template.yaml"
+
+                  {% if helm_diff_kustomize_patches_yaml != "" %}
+                  kubectl kustomize "$tempdir" > "$tempdir/helm-template-kustomized.yaml"
+                  kubectl_diff_src_file="$tempdir/helm-template-kustomized.yaml"
+                  {% endif %}
+
+                  set +e
+                  printf "Determining whether a helm upgrade for the %s release would result in any changes\n" {{ helm_release_name | quote }}
+                  cat "$kubectl_diff_src_file" \
+                  {% for yqe in helm_diff_yq_filter_expressions %}
+                      | yq --yaml-output --yaml-roundtrip {{ yqe | quote }} - | sed -e 's/^--- null$//g' \
+                  {% endfor %}
+                      | kubectl diff --namespace {{ helm_namespace | quote }} -f - 2>&1
+                  helm_template_kubectl_diff_retval="$?"
+                  set -e
+
+                  if [ "$helm_template_kubectl_diff_retval" -ne 0 ] && [ "$helm_template_kubectl_diff_retval" -ne 1 ]; then
+                      # Exit code 1 from kubectl diff indicates differences were found.
+                      # Any other non-zero exit code indicates an unexpected error.
+                      echo "Helm template and kubectl diff failed with unexpected return code $helm_template_kubectl_diff_retval" >&2
+                      exit "$helm_template_kubectl_diff_retval"
+                  fi
+
+                  if [ "$helm_template_kubectl_diff_retval" -ne 0 ]; then
+                      need_upgrade=y
+                  fi
+              fi
+
+              if [ "$need_upgrade" == "y" ]; then
+                  printf "Upgrading the %s release via the Helm chart\n" {{ helm_release_name | quote }}
+                  helm upgrade {{ helm_release_name | quote }} {{ helm_chart_ref | quote }} \
+                      --namespace {{ helm_namespace | quote }} \
+                      --version {{ helm_chart_version | quote }} \
+                      "${var_args[@]}"
+                  exit 99
+              else
+                  printf "Helm release %s is already up-to-date\n" {{ helm_release_name | quote }}
+              fi
+          args:
+            executable: /bin/bash
+          vars:
+            helm_chart_ref: '{{ (helm_chart_url if helm_chart_url.startswith("oci://") else (helm_repo_name + "/" + helm_chart_name)) }}'
+          register: helm_chart_install_or_upgrade_result
+          changed_when: 'helm_chart_install_or_upgrade_result.rc == 99'
+          failed_when: 'helm_chart_install_or_upgrade_result.rc not in [0, 99]'
+
+      always:
+        - name: "Remove the temporary work directory"
+          ansible.builtin.file:
+            path: "{{ helm_kubectl_k3s_clsuter_ansible_tempdir.path }}"
+            state: absent
+          changed_when: false
