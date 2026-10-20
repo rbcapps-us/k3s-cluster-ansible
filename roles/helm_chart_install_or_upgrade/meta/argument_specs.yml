@@ -2,24 +2,8 @@ argument_specs:
   main:
     short_description: "Install or upgrade a package using its Helm chart"
     description: |
-      This role must run with become: true, and become_user set to a user which can run kubectl commands.
-      The user under which the commands will be executed must be determined by the playbook or role that includes this role.
-      Since become_user is not valid with ansible.builtin.include_role, you'll need to wrap ansible.builtin.include_role
-      with an outer block which sets become_user.
-      Typically, this would look like (assuming you have already run the init role, or explicitly set superuser_name in
-      your playbook):
-        - name: "Install or upgrade <package-name>"
-          become: true
-          become_user: "{{ kube_api_user }}"
-          block:
-            - name: "Install or upgrade <package-name> via the <package-name> Helm chart"
-              ansible.builtin.include_role:
-                name: helm_chart_install_or_upgrade
-              vars:
-                ...
-
       This role sets the following variables on the host:
-        - helm_chart_install_or_upgrade_result: A registred result from ansible.builtin.shell for the commands which were executed.
+        - helm_chart_install_or_upgrade_result: A registered result from ansible.builtin.shell for the commands which were executed.
     options:
       helm_namespace:
         description: 'The Kubernetes namespace into which the application will be installed'
