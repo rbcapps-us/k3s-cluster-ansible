@@ -101,7 +101,7 @@
                   {% for yqe in helm_diff_yq_filter_expressions %}
                       | yq --yaml-output --yaml-roundtrip {{ yqe | quote }} - | sed -e 's/^--- null$//g' \
                   {% endfor %}
-                      | kubectl diff --namespace {{ "" if helm_omit_namespace_argument_from_kubectl_diff else (helm_namespace | quote) }} -f - 2>&1
+                      | kubectl diff {{ "" if helm_omit_namespace_argument_from_kubectl_diff else ("--namespace " ~ (helm_namespace | quote)) }} -f - 2>&1
                   helm_template_kubectl_diff_retval="$?"
                   set -e
 
