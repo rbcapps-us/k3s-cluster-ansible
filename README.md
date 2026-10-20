@@ -67,6 +67,7 @@ Validate playbooks and roles for lint errors:
 ## Publishing a new version of the Galaxy collection
 
 * Update the version in galaxy.yml
+* Commit and push the change
 * Run:
     ```sh
     ansible-galaxy collection build
