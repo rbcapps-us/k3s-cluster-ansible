@@ -1,0 +1,15 @@
+argument_specs:
+  main:
+    short_description: "Uninistall a package which was installed with Helm"
+    description: |
+      This role sets the following variables on the host:
+        - helm_chart_uninstall_result: A registered result from ansible.builtin.shell for the commands which were executed.
+    options:
+      helm_namespace:
+        description: 'The Kubernetes namespace in which the application was installed'
+        type: str
+        required: true
+      helm_release_name:
+        description: 'The release name under which the application was installed'
+        type: str
+        required: true

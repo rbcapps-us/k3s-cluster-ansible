@@ -1,0 +1,31 @@
+- name: "Uninstall Helm release {{ helm_release_name }}, if it is installed"
+  run_once: true
+  become: true
+  become_user: "{{ kube_api_user }}"
+  ansible.builtin.shell:
+    cmd: |
+      set -e
+      set -o pipefail
+
+      set +e
+      helm_status_output=$(helm -n {{ helm_namespace | quote }} status {{ helm_release_name | quote }} 2>&1)
+      helm_status_result="$?"
+      set -e
+
+      if [ "$helm_status_result" -eq 0 ]; then
+          helm -n {{ helm_namespace | quote }} uninstall {{ helm_release_name | quote }}
+          exit 99
+      fi
+
+      if [ "$helm_status_result" -eq 1 ] && [[ "$helm_status_output" == *"release: not found"* ]]; then
+          exit 0
+      fi
+
+      echo "Unexpected result from helm status (exit code $helm_status_result):" >&2
+      printf '%s\n' "$helm_status_output" >&2
+      exit "$helm_status_result"
+  args:
+    executable: /bin/bash
+  register: docker_registry_uninstall_result
+  failed_when: "docker_registry_uninstall_result.rc not in [0, 99]"
+  changed_when: "docker_registry_uninstall_result.rc == 99"
