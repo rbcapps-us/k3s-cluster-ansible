@@ -3,11 +3,36 @@
   become: true
   become_user: "{{ kube_api_user }}"
   block:
+    - name: "If whereabouts is found in the default namespace, remove it"
+      ansible.builtin.shell:
+        cmd: |
+          set -euo pipefail
+
+          echo "Checking for whereabouts release in the default namespace."
+          set +e
+          helm --namespace default status whereabouts >/dev/null 2>&1
+          helm_status_retval="$?"
+          set -e
+
+          if [ "$helm_status_retval" -eq 0 ]; then
+              echo "Whereabouts release found in the default namespace, removing it."
+              helm --namespace default uninstall whereabouts
+              exit 99
+          fi
+
+          exit 0
+      args:
+        executable: /bin/bash
+      register: whereabouts_old_location_removal_result
+      changed_when: "whereabouts_old_location_removal_result.rc == 99"
+      failed_when: "whereabouts_old_location_removal_result.rc not in [0, 99]"
+
+
     - name: "Install or upgrade Whereabouts IPAM plugin via the Whereabouts Helm chart"
       ansible.builtin.include_role:
         name: helm_chart_install_or_upgrade
       vars:
-        helm_namespace: "default"
+        helm_namespace: "kube-system"
         helm_release_name: "whereabouts"
         helm_repo_name: ""
         helm_chart_name: "whereabouts-chart"
