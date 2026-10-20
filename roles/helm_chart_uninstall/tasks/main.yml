@@ -26,6 +26,6 @@
       exit "$helm_status_result"
   args:
     executable: /bin/bash
-  register: docker_registry_uninstall_result
-  failed_when: "docker_registry_uninstall_result.rc not in [0, 99]"
-  changed_when: "docker_registry_uninstall_result.rc == 99"
+  register: helm_chart_uninstall_result
+  failed_when: "helm_chart_uninstall_result.rc not in [0, 99]"
+  changed_when: "helm_chart_uninstall_result.rc == 99"
