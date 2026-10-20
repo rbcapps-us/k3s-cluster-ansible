@@ -1,2 +1,3 @@
+helm_omit_namespace_argument_from_kubectl_diff: false
 helm_diff_kustomize_patches_yaml: ""
 helm_diff_yq_filter_expressions: []

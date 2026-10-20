@@ -222,6 +222,8 @@
                 longhorn_helm_ingress_args +
                 longhorn_helm_extra_args
               }}
+            helm_omit_namespace_argument_from_kubectl_diff: false
+            helm_diff_kustomize_patches_yaml: ""
             helm_diff_yq_filter_expressions:
               - 'select((.kind == "Job" and .metadata.name == "longhorn-pre-upgrade") | not)'
               - 'select((.kind == "Job" and .metadata.name == "longhorn-post-upgrade") | not)'

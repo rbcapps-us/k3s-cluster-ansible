@@ -50,6 +50,13 @@ argument_specs:
         type: list
         elements: str
         required: true
+      helm_omit_namespace_argument_from_kubectl_diff:
+        description: |
+            Whether to omit the --namespace argument from the kubectl diff command when comparing the Helm-generated template with
+            the live cluster.
+            Optional.  Defaults to false.
+        type: bool
+        required: false
       helm_diff_kustomize_patches_yaml:
         description: |
             The patches: section of a kustomization.yaml file to apply to the Helm-generated template before performing the

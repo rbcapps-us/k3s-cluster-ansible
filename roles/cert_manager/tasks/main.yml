@@ -14,6 +14,8 @@
         helm_chart_url: "{{ cert_manager_helm_chart_url }}"
         helm_chart_version: "{{ cert_manager_helm_chart_version }}"
         helm_args: "{{ cert_manager_helm_base_args + cert_manager_helm_extra_args }}"
+        helm_omit_namespace_argument_from_kubectl_diff: true
+        helm_diff_kustomize_patches_yaml: ""
         helm_diff_yq_filter_expressions:
           - 'select((.kind == "Job" and .metadata.name == "cert-manager-startupapicheck") | not)'
           - 'select((.kind == "Role" and .metadata.name == "cert-manager-startupapicheck:create-cert") | not)'
