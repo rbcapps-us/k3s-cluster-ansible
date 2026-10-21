@@ -75,7 +75,7 @@
                   set -o pipefail
 
                   {% for creds in longhorn_ui_credentials %}
-                  htpasswd -vb {{ longhorn_htpasswd_tempfile.path }} {{ creds.username | quote }} {{ creds.password | quote }}
+                  htpasswd -vb {{ longhorn_htpasswd_tempfile.path | quote }} {{ creds.username | quote }} {{ creds.password | quote }}
                   {% endfor %}
               args:
                 executable: /bin/bash

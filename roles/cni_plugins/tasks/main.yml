@@ -16,7 +16,12 @@
           set -euo pipefail
 
           cni_plugins_bin_dir={{ cni_plugins_bin_dir | quote }}
-          for plugin in {{ cni_plugins_needed_plugins | map('quote') | list | join(' ') }}; do
+          cni_plugins_needed_plugins=()
+          {% for plugin in cni_plugins_needed_plugins %}
+          cni_plugins_needed_plugins+=({{ plugin | quote }})
+          {% endfor %}
+
+          for plugin in "${cni_plugins_needed_plugins[@]}"; do
               plugin_path="${cni_plugins_bin_dir}/${plugin}"
               if [ ! -x "$plugin_path" ]; then
                   echo "Not found: $plugin" >&2

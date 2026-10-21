@@ -49,7 +49,7 @@
               set -euo pipefail
 
               set +e
-              kubectl diff -k "{{ multus_cni_tempdir.path }}"
+              kubectl diff -k "{{ multus_cni_tempdir.path | quote }}"
               kubectl_diff_retval="$?"
               set -e
 
@@ -60,7 +60,7 @@
                       echo "kubectl diff failed with unexpected return code $kubectl_diff_retval" >&2
                       exit "$kubectl_diff_retval"
                   fi
-                  kubectl apply -k "{{ multus_cni_tempdir.path }}"
+                  kubectl apply -k "{{ multus_cni_tempdir.path | quote }}"
                   exit 99
               fi
           args:

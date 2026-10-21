@@ -41,7 +41,7 @@
               set +e
               # Determine whether the Helm repository needs to be added; if so, add it.
               printf "Determining whether the %s helm repository needs to be added\n" {{ helm_repo_name | quote }}
-              if ! helm repo list | grep -q '^'{{ helm_repo_name | quote }}'\s'; then
+              if ! helm repo list | grep -q '^'{{ (helm_repo_name) | quote }}'\s'; then
                   printf "Adding the helm repository: %s\n" {{ helm_repo_name | quote }}
                   helm repo add {{ helm_repo_name | quote }} {{ helm_chart_url | quote }}
               fi
@@ -96,13 +96,19 @@
                   kubectl_diff_src_file="$tempdir/helm-template-kustomized.yaml"
                   {% endif %}
 
+                  {% if helm_omit_namespace_argument_from_kubectl_diff %}
+                  kubectl_diff_namespace_args=()
+                  {% else %}
+                  kubectl_diff_namespace_args=("--namespace" "{{ helm_namespace | quote }}")
+                  {% endif %}
+
                   set +e
                   printf "Determining whether a helm upgrade for the %s release would result in any changes\n" {{ helm_release_name | quote }}
                   cat "$kubectl_diff_src_file" \
                   {% for yqe in helm_diff_yq_filter_expressions %}
                       | yq --yaml-output --yaml-roundtrip {{ yqe | quote }} - | sed -e 's/^--- null$//g' \
                   {% endfor %}
-                      | kubectl diff {{ "" if helm_omit_namespace_argument_from_kubectl_diff else ("--namespace " ~ (helm_namespace | quote)) }} -f - 2>&1
+                      | kubectl diff "${kubectl_diff_namespace_args[@]}" -f - 2>&1
                   helm_template_kubectl_diff_retval="$?"
                   set -e
 

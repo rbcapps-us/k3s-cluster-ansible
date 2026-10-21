@@ -76,9 +76,9 @@
         cmd: |
           set -euo pipefail
 
-          kubectl cordon {{ k3s_install_host.split('.')[0] }}
-          kubectl drain {{ k3s_install_host.split('.')[0] }} --ignore-daemonsets --delete-emptydir-data --force
-          kubectl delete node {{ k3s_install_host.split('.')[0] }}
+          kubectl cordon {{ k3s_install_host.split('.')[0] | quote }}
+          kubectl drain {{ k3s_install_host.split('.')[0] | quote }} --ignore-daemonsets --delete-emptydir-data --force
+          kubectl delete node {{ k3s_install_host.split('.')[0] | quote }}
       args:
         executable: /bin/bash
       changed_when: true
@@ -139,10 +139,15 @@
             cmd: |
               set -euo pipefail
 
+              install_k3s_exec_args=()
+              {% for arg in install_k3s_exec_args %}
+              install_k3s_exec_args+=({{ arg | quote }})
+              {% endfor %}
+
               INSTALL_K3S_VERSION={{ k3s_version | quote }} \
                   {{ (k3s_cluster_k3s_installer_tempdir.path + "/k3s-install.sh") | quote }} \
                   {{ node_k3s_role | quote }} \
-                  {{ install_k3s_exec_args | join(' ') }}
+                  "${install_k3s_exec_args[@]}"
           args:
             executable: /bin/bash
           no_log: true
@@ -157,14 +162,14 @@
                 (
                   [
                     "--server",
-                    ("https://" + k3s_cluster_k3s_api_host_ipv4 + ":6443") | quote,
+                    ("https://" + k3s_cluster_k3s_api_host_ipv4 + ":6443"),
                     "--token",
-                    k3s_cluster_k3s_api_host_token | quote,
+                    k3s_cluster_k3s_api_host_token,
                   ] if k3s_cluster_k3s_api_host_ipv4 != "" and k3s_cluster_k3s_api_host_token != "" else []
                 ) +
                 (
                   [
-                    ("--cluster-cidr=" + k3s_cluster_pod_network_cidr) | quote,
+                    ("--cluster-cidr=" + k3s_cluster_pod_network_cidr),
                     "--secrets-encryption",
                   ] if node_k3s_role == "server" else []
                 ) +
@@ -210,9 +215,14 @@
             cmd: |
               set -euo pipefail
 
+              install_k3s_exec_args=()
+              {% for arg in install_k3s_exec_args %}
+              install_k3s_exec_args+=({{ arg | quote }})
+              {% endfor %}
+
               INSTALL_K3S_VERSION={{ k3s_version | quote }} \
                   {{ (k3s_cluster_k3s_installer_tempdir.path + "/k3s-install.sh") | quote }} \
-                  {{ install_k3s_exec_args | join(' ') }}
+                  "${install_k3s_exec_args[@]}"
           args:
             executable: /bin/bash
           no_log: true
@@ -220,7 +230,7 @@
             install_k3s_exec_args: |
               {{
                 [
-                  ("--cluster-cidr=" + k3s_cluster_pod_network_cidr) | quote,
+                  ("--cluster-cidr=" + k3s_cluster_pod_network_cidr),
                   "--secrets-encryption",
                 ] +
                 (
