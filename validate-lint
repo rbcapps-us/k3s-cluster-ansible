@@ -20,10 +20,9 @@ if [ "$retval" -ne 0 ] && [ "$final_retval" -eq 0 ]; then
     final_retval="$retval"
 fi
 
-if [ "$final_retval" -eq 0 ]; then
-    echo "SUCCESS!"
+if [ "$final_retval" -ne 0 ]; then
+    echo "FAILURE: One or more playbooks, tasks or handlers failed lint validation." >&2
 else
-    echo "One or more playbooks or roles failed lint validation." >&2
+    echo "SUCCESS: All playbooks, tasks and handlers passed lint validation."
 fi
-
 exit "$final_retval"
