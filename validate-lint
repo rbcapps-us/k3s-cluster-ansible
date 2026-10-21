@@ -7,7 +7,7 @@ cd $(dirname "$0")
 final_retval=0
 
 echo "Running ansible-lint to check playbook, task and handler formatting..."
-{ find playbooks -type f \( -name "*.yaml" -o -name "*.yml" \) -mindepth 1 -maxdepth 1 -print0 ; find roles -type f \( -name "*.yaml" -o -name "*.yml" \) \( -path '*/tasks/*' -o -path '*/handlers/*' \) -mindepth 3 -print0 ; } | xargs -0 ansible-lint
+{ find playbooks -type f \( -name "*.yaml" -o -name "*.yml" \) ! -path "./.git/*" ! -path "./.config/*" ! -path "./.ansible/*" -mindepth 1 -maxdepth 1 -print0 ; find roles -type f \( -name "*.yaml" -o -name "*.yml" \) \( -path '*/tasks/*' -o -path '*/handlers/*' \) ! -path "./.git/*" ! -path "./.config/*" ! -path "./.ansible/*" -mindepth 3 -print0 ; } | xargs -0 ansible-lint
 retval="$?"
 if [ "$retval" -ne 0 ] && [ "$final_retval" -eq 0 ]; then
     final_retval="$retval"
