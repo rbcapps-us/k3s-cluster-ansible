@@ -1,1 +1,0 @@
-roles/cni_plugins/vars/main.yml yaml[line-length]
