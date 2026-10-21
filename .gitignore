@@ -1,4 +1,5 @@
 .ansible
 *.swp
+__pycache__
 examples/inventories/k3s-test-cluster/ansible-become-password.txt
 rbcapps_us-k3s_cluster_ansible-*.tar.gz

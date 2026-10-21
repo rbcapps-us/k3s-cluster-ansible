@@ -1,5 +1,12 @@
 profile: production
 
+use_default_rules: true
+rulesdir:
+  - ./ansible_lint_custom_rules/
+
+enable_list:
+  - shell-unquoted-jinja
+
 skip_list:
   - name[template]
   - var-naming[no-role-prefix]
