@@ -1,0 +1,54 @@
+argument_specs:
+  main:
+    short_description: "Configure or remove the Keepalived cluster load balancer"
+    options:
+      superuser_name:
+        description: "Superuser used to install and manage Keepalived and own its configuration files, normally determined by the init role."
+        type: str
+      superuser_group:
+        description: "Group owning Keepalived configuration files, normally determined by the init role."
+        type: str
+      k3s_hosts_group:
+        description: "Inventory group containing cluster nodes. Its ordering determines VRRP state and priority, and its members provide the backend IPv4 addresses."
+        type: str
+      cluster_load_balancer_services:
+        description: "Services managed by Keepalived. An empty list tears down the K3s-managed load balancer configuration."
+        type: list
+        elements: dict
+        options:
+          vrrp_instance_name:
+            description: "VRRP instance name, also used in the managed configuration filename."
+            type: str
+            required: true
+          network_interface:
+            description: "Network interface on which to advertise the virtual IP address."
+            type: str
+            required: true
+          virtual_router_id:
+            description: "VRRP virtual router identifier."
+            type: int
+            required: true
+          ip_address:
+            description: "Virtual IP address for the load balanced service."
+            type: str
+            required: true
+          ports:
+            description: "TCP ports and their backend health check configuration."
+            type: list
+            elements: dict
+            required: true
+            options:
+              port_number:
+                description: "Port number used by the virtual server and backend servers."
+                type: int
+                required: true
+              health_check_protocol:
+                description: "Backend health check protocol: http, https or tcp."
+                type: str
+                required: true
+              health_check_path:
+                description: "URL path for HTTP or HTTPS health checks. Required when health_check_protocol is http or https."
+                type: str
+              health_check_healthy_status_codes:
+                description: "Healthy HTTP status codes or ranges, such as 200-299,404. Required for HTTP or HTTPS health checks."
+                type: str

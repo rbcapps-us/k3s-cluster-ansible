@@ -1,0 +1,7 @@
+argument_specs:
+  main:
+    short_description: "Create and display a Headlamp administrator token"
+    options:
+      kube_api_user:
+        description: "User with Kubernetes API access, used to run kubectl and create the Headlamp token."
+        type: str

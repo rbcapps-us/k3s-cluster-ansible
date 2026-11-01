@@ -1,0 +1,11 @@
+argument_specs:
+  main:
+    short_description: "Remove K3s-managed Keepalived configuration and uninstall unused Keepalived"
+    options:
+      superuser_name:
+        description: "Superuser used to remove configuration and manage Keepalived, normally determined by the init role."
+        type: str
+      cluster_load_balancer_services:
+        description: "Configured cluster load balancer services. An empty list permits stopping and disabling Keepalived when no externally managed configuration remains."
+        type: list
+        elements: dict

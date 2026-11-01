@@ -1,0 +1,5 @@
+argument_specs:
+  main:
+    short_description: "Shut down the nodes"
+    description: "This role has no role-specific input variables. Privilege escalation uses the play or inventory settings."
+    options: {}

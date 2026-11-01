@@ -1,0 +1,13 @@
+argument_specs:
+  main:
+    short_description: "Uninstall K3s and remove residual cluster files and directories"
+    options:
+      superuser_home:
+        description: "Superuser home directory, normally determined by the init role. Its .kube directory is removed."
+        type: str
+      kube_api_user_home:
+        description: "Kubernetes API user home directory. Its .kube directory is removed."
+        type: str
+      k3s_storage_dir:
+        description: "Optional custom storage directory. When non-empty, its k3s and longhorn subdirectories are removed."
+        type: str

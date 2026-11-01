@@ -1,0 +1,28 @@
+argument_specs:
+  main:
+    short_description: "Install prerequisite packages and create the Kubernetes API user and group"
+    options:
+      superuser_name:
+        description: "Superuser used to install and remove packages, normally determined by the init role."
+        type: str
+      install_longhorn:
+        description: "Whether Longhorn is to be installed.  Certain prerequisites are needed for Longhorn, such as uninstalling the multipath-tools package, which interferes with Longhorn's volumes."
+        type: bool
+      node_k3s_role:
+        description: "Node role assigned by the init role. The Kubernetes API access user and group are created only on server nodes, because agent nodes do not expose the Kubernetes API."
+        type: str
+      kube_api_group:
+        description: "Name of the Kubernetes API access group to create on server nodes."
+        type: str
+      kube_api_group_id:
+        description: "Optional GID for the Kubernetes API access group. A null or missing value lets the operating system allocate the GID."
+        type: int
+      kube_api_user:
+        description: "Name of the Kubernetes API user to create on server nodes."
+        type: str
+      kube_api_user_id:
+        description: "Optional UID for the Kubernetes API user. A null or missing value lets the operating system allocate the UID."
+        type: int
+      kube_api_user_home:
+        description: "Home directory for the Kubernetes API user on server nodes."
+        type: str
