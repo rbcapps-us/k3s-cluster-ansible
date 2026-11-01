@@ -1,0 +1,47 @@
+- name: "Run kubectl apply tasks"
+  run_once: true
+  become: true
+  become_user: "{{ kube_api_user }}"
+  block:
+    - name: "Validate kubectl apply manifest inputs"
+      ansible.builtin.assert:
+        that:
+          - '(kubectl_apply_manifest_path != "") != (kubectl_apply_manifest_yaml_text != "")'
+          - 'not kubectl_apply_use_kustomize or (kubectl_apply_manifest_path != "" and kubectl_apply_manifest_yaml_text == "")'
+        fail_msg: "Specify exactly one non-empty kubectl_apply_manifest_path or kubectl_apply_manifest_yaml_text. kubectl_apply_use_kustomize requires kubectl_apply_manifest_path and cannot be used with kubectl_apply_manifest_yaml_text."
+
+    - name: "Diff and apply {{ kubectl_apply_manifest_description }}"
+      ansible.builtin.shell:
+        cmd: |
+          set -euo pipefail
+
+          {% if kubectl_apply_manifest_yaml_text != "" %}
+          IFS= read -r -d '' kubectl_apply_manifest_yaml_text || true
+          {% endif %}
+
+          set +e
+          {% if kubectl_apply_manifest_yaml_text != "" %}
+          printf '%s' "$kubectl_apply_manifest_yaml_text" |
+          {% endif %}
+          kubectl diff {% if kubectl_apply_namespace != "" %}--namespace {{ kubectl_apply_namespace | quote }} {% endif %}{{ ('-k' if kubectl_apply_use_kustomize else '-f') | quote }} {{ (kubectl_apply_manifest_path if kubectl_apply_manifest_path != "" else '-') | quote }}
+          kubectl_diff_retval="$?"
+          set -e
+
+          if [ "$kubectl_diff_retval" -ne 0 ]; then
+              if [ "$kubectl_diff_retval" -ne 1 ]; then
+                  echo "kubectl diff failed with unexpected return code $kubectl_diff_retval" >&2
+                  exit "$kubectl_diff_retval"
+              fi
+              {% if kubectl_apply_manifest_yaml_text != "" %}
+              printf '%s' "$kubectl_apply_manifest_yaml_text" |
+              {% endif %}
+              kubectl apply {% if kubectl_apply_namespace != "" %}--namespace {{ kubectl_apply_namespace | quote }} {% endif %}{{ ('-k' if kubectl_apply_use_kustomize else '-f') | quote }} {{ (kubectl_apply_manifest_path if kubectl_apply_manifest_path != "" else '-') | quote }}
+              exit 99
+          fi
+        stdin: "{{ kubectl_apply_manifest_yaml_text if kubectl_apply_manifest_yaml_text != '' else omit }}"
+        stdin_add_newline: false
+      args:
+        executable: /bin/bash
+      register: kubectl_apply_result
+      changed_when: "kubectl_apply_result.rc == 99"
+      failed_when: "kubectl_apply_result.rc not in [0, 99]"

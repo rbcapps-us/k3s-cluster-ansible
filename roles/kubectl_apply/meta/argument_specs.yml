@@ -1,0 +1,27 @@
+argument_specs:
+  main:
+    short_description: "Apply Kubernetes resources only when kubectl diff detects changes"
+    description: |
+      This role sets kubectl_apply_result to the registered shell result, including stdout, stderr and rc.
+      A return code of 0 indicates no changes; 99 indicates a successful apply.
+    options:
+      kubectl_apply_manifest_description:
+        description: "Description of the manifest, displayed in the diff and apply task name."
+        type: str
+        required: true
+      kubectl_apply_manifest_path:
+        description: "Path on the target host to a YAML manifest, or a directory containing kustomization.yaml when kubectl_apply_use_kustomize is true. Mutually exclusive with kubectl_apply_manifest_yaml_text."
+        type: str
+        default: ""
+      kubectl_apply_manifest_yaml_text:
+        description: "Literal YAML manifest passed to kubectl via stdin. Mutually exclusive with kubectl_apply_manifest_path and cannot be used with kubectl_apply_use_kustomize."
+        type: str
+        default: ""
+      kubectl_apply_use_kustomize:
+        description: "Use -k instead of -f. Requires a non-empty kubectl_apply_manifest_path."
+        type: bool
+        default: false
+      kubectl_apply_namespace:
+        description: "Optional Kubernetes namespace. When empty, the --namespace argument is omitted from the kubectl commands."
+        type: str
+        default: ""
