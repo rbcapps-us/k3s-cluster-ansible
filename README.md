@@ -37,12 +37,12 @@ Create a file named *inventories/k3s-test-cluster/ansible-become-password.txt*, 
 
 This collection contains the following playbooks:
 
-* [rbcapps_us.k3s_cluster_ansible.alive_check](../playbooks/alive_check.yml): Confirms that all nodes are alive and reachable.
-* [rbcapps_us.k3s_cluster_ansible.headlamp_token](../playbooks/headlamp_token.yml): Creates a new token for logging into the Headlamp dashboard.
-* [rbcapps_us.k3s_cluster_ansible.reboot](../playbooks/reboot.yml): Reboots all nodes.
-* [rbcapps_us.k3s_cluster_ansible.setup_k3s_cluster](../playbooks/setup_k3s_cluster.yml): Builds out a K3s cluster across the nodes (hosts) in the inventory.
-* [rbcapps_us.k3s_cluster_ansible.shutdown](../playbooks/shutdown.yml): Shuts down all nodes.
-* [rbcapps_us.k3s_cluster_ansible.uninstall_k3s](../playbooks/uninstall_k3s.yml): Uninstalls k3s from all nodes (hosts) in the inventory.
+* [rbcapps_us.k3s_cluster_ansible.alive_check](playbooks/alive_check.yml): Confirms that all nodes are alive and reachable.
+* [rbcapps_us.k3s_cluster_ansible.headlamp_token](playbooks/headlamp_token.yml): Creates a new token for logging into the Headlamp dashboard.
+* [rbcapps_us.k3s_cluster_ansible.reboot](playbooks/reboot.yml): Reboots all nodes.
+* [rbcapps_us.k3s_cluster_ansible.setup_k3s_cluster](playbooks/setup_k3s_cluster.yml): Builds out a K3s cluster across the nodes (hosts) in the inventory.
+* [rbcapps_us.k3s_cluster_ansible.shutdown](playbooks/shutdown.yml): Shuts down all nodes.
+* [rbcapps_us.k3s_cluster_ansible.uninstall_k3s](playbooks/uninstall_k3s.yml): Uninstalls k3s from all nodes (hosts) in the inventory.
 
 ## List of Roles in the Collection
 
