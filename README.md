@@ -44,6 +44,33 @@ This collection contains the following playbooks:
 * [rbcapps_us.k3s_cluster_ansible.shutdown](../playbooks/shutdown.yml): Shuts down all nodes.
 * [rbcapps_us.k3s_cluster_ansible.uninstall_k3s](../playbooks/uninstall_k3s.yml): Uninstalls k3s from all nodes (hosts) in the inventory.
 
+## List of Roles in the Collection
+
+This collection contains the following roles:
+
+* [rbcapps_us.k3s_cluster_ansible.alive_check](roles/alive_check/README.md): Checks node connectivity and displays the effective user and group with privilege escalation.
+* [rbcapps_us.k3s_cluster_ansible.cert_manager](roles/cert_manager/README.md): Installs Cert-Manager and optionally configures a cluster-local CA and a default Traefik TLS certificate.
+* [rbcapps_us.k3s_cluster_ansible.cni_plugins](roles/cni_plugins/README.md): Installs additional standard CNI plugins into the active K3s data directory.
+* [rbcapps_us.k3s_cluster_ansible.headlamp](roles/headlamp/README.md): Installs the Headlamp dashboard with an administrator service account and optional Traefik ingress.
+* [rbcapps_us.k3s_cluster_ansible.headlamp_token](roles/headlamp_token/README.md): Creates and displays a token for logging into Headlamp as an administrator.
+* [rbcapps_us.k3s_cluster_ansible.helm](roles/helm/README.md): Installs or upgrades the Helm CLI on K3s server nodes.
+* [rbcapps_us.k3s_cluster_ansible.helm_chart_install_or_upgrade](roles/helm_chart_install_or_upgrade/README.md): Installs a Helm release or upgrades it when the chart version or rendered resources differ from the cluster.
+* [rbcapps_us.k3s_cluster_ansible.helm_chart_uninstall](roles/helm_chart_uninstall/README.md): Uninstalls a Helm release if it exists.
+* [rbcapps_us.k3s_cluster_ansible.init](roles/init/README.md): Initializes shared cluster settings, discovers privileged-user information, and validates cluster configuration.
+* [rbcapps_us.k3s_cluster_ansible.k3s_cluster](roles/k3s_cluster/README.md): Installs or upgrades K3s, configures kubeconfig access, and optionally relocates local storage.
+* [rbcapps_us.k3s_cluster_ansible.keepalived_cluster_load_balancer](roles/keepalived_cluster_load_balancer/README.md): Configures Keepalived virtual IP failover and TCP load balancing across cluster nodes.
+* [rbcapps_us.k3s_cluster_ansible.keepalived_cluster_load_balancer_uninstall](roles/keepalived_cluster_load_balancer_uninstall/README.md): Removes K3s-managed Keepalived configuration and uninstalls Keepalived when no externally managed configuration remains.
+* [rbcapps_us.k3s_cluster_ansible.kubectl_apply](roles/kubectl_apply/README.md): Diffs and applies Kubernetes manifests or Kustomize resources, reporting changes only when an apply is needed.
+* [rbcapps_us.k3s_cluster_ansible.longhorn](roles/longhorn/README.md): Installs Longhorn storage, an RWX StorageClass, and optional authenticated dashboard ingress.
+* [rbcapps_us.k3s_cluster_ansible.multus_cni](roles/multus_cni/README.md): Installs Multus CNI with K3s-specific paths and Flannel delegation for secondary pod networks.
+* [rbcapps_us.k3s_cluster_ansible.prereq](roles/prereq/README.md): Installs prerequisite packages and creates the Kubernetes API access user and group on server nodes.
+* [rbcapps_us.k3s_cluster_ansible.reboot](roles/reboot/README.md): Reboots targeted nodes and waits for them to return.
+* [rbcapps_us.k3s_cluster_ansible.reflector](roles/reflector/README.md): Installs Emberstack Reflector for replication of annotated Secrets and ConfigMaps across namespaces.
+* [rbcapps_us.k3s_cluster_ansible.reloader](roles/reloader/README.md): Installs Stakater Reloader to trigger workload rollouts when Secrets or ConfigMaps change.
+* [rbcapps_us.k3s_cluster_ansible.shutdown](roles/shutdown/README.md): Shuts down targeted nodes.
+* [rbcapps_us.k3s_cluster_ansible.uninstall_k3s](roles/uninstall_k3s/README.md): Uninstalls K3s and removes residual cluster files, kubeconfig directories, and Longhorn data.
+* [rbcapps_us.k3s_cluster_ansible.whereabouts](roles/whereabouts/README.md): Installs the Whereabouts IPAM plugin in kube-system and removes a legacy release from the default namespace.
+
 ## Playbook Defaults
 
 Shared defaults and component installation switches are stored in [roles/init/defaults/main.yml](roles/init/defaults/main.yml) and documented in [roles/init/meta/argument_specs.yml](roles/init/meta/argument_specs.yml).  Role-specific defaults and their documentation are stored in each role's `defaults/main.yml` and `meta/argument_specs.yml` under [roles](roles).  For example, Longhorn settings are in [roles/longhorn/defaults/main.yml](roles/longhorn/defaults/main.yml) and [roles/longhorn/meta/argument_specs.yml](roles/longhorn/meta/argument_specs.yml).  You can override these values by setting them in the inventory, or, if you are calling roles directly from your own playbooks, by explicitly setting facts or passing vars to the roles which you call.
