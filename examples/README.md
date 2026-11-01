@@ -31,7 +31,9 @@ NOTE: If you want to use the local copy of this collection, you can run the foll
 ```
 This is also useful when making changes to the collection's playbooks or roles.  In that case, you can run the *install-local* before each playbook run, and that will ensure that you're always using the latest copy of the local playbooks and roles from the collection.
 
-## Set the Inventory Environment Variables; Set up the K3s cluster
+## Create the Inventory; Set the Inventory Environment Variables; Set up the K3s cluster
+
+Copy `inventories/k3s-test-cluster/group_vars/all.yml.sample` to `inventories/k3s-test-cluster/group_vars/all.yml`.
 
 Set environment variables for the example inventory:
 ```sh
