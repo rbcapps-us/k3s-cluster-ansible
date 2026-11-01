@@ -1,14 +1,26 @@
 - name: "Run kubectl apply tasks"
   run_once: true
   become: true
-  become_user: "{{ kube_api_user }}"
+  become_user: "{{ kubectl_apply_become_user }}"
   block:
+    - debug:
+        msg:
+          - "kubectl_apply_manifest_description: {{ kubectl_apply_manifest_description }}"
+          - "kubectl_apply_manifest_path: {{ kubectl_apply_manifest_path }}"
+          - "kubectl_apply_manifest_yaml_text: {{ kubectl_apply_manifest_yaml_text }}"
+          - "kubectl_apply_use_kustomize: {{ kubectl_apply_use_kustomize }}"
+          - "kubectl_apply_namespace: {{ kubectl_apply_namespace }}"
+
     - name: "Validate kubectl apply manifest inputs"
       ansible.builtin.assert:
-        that:
-          - '(kubectl_apply_manifest_path != "") != (kubectl_apply_manifest_yaml_text != "")'
-          - 'not kubectl_apply_use_kustomize or (kubectl_apply_manifest_path != "" and kubectl_apply_manifest_yaml_text == "")'
-        fail_msg: "Specify exactly one non-empty kubectl_apply_manifest_path or kubectl_apply_manifest_yaml_text. kubectl_apply_use_kustomize requires kubectl_apply_manifest_path and cannot be used with kubectl_apply_manifest_yaml_text."
+        that: '(kubectl_apply_manifest_path != "") != (kubectl_apply_manifest_yaml_text != "")'
+        fail_msg: "Specify exactly one non-empty kubectl_apply_manifest_path or kubectl_apply_manifest_yaml_text."
+
+    - name: "Validate that the caller is not trying to use kustomize on a YAML manifest literal string"
+      when: kubectl_apply_use_kustomize
+      ansible.builtin.assert:
+        that: 'kubectl_apply_manifest_path != "" and kubectl_apply_manifest_yaml_text == ""'
+        fail_msg: "kubectl_apply_use_kustomize requires kubectl_apply_manifest_path and cannot be used with kubectl_apply_manifest_yaml_text."
 
     - name: "Apply {{ kubectl_apply_manifest_description }}, if needed"
       ansible.builtin.shell:

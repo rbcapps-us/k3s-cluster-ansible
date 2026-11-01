@@ -50,12 +50,13 @@
             - name: "Apply the cert-manager local CA resources manifest"
               ansible.builtin.include_role:
                 name: kubectl_apply
-                vars:
-                  kubectl_apply_manifest_description: "cert-manager local CA resources"
-                  kubectl_apply_manifest_path: "{{ cert_manager_local_ca_resources_tempdir.path }}/cert-manager-local-ca-resources.yaml"
-                  kubectl_apply_manifest_yaml_text: ""
-                  kubectl_apply_use_kustomize: false
-                  kubectl_apply_namespace: ""
+              vars:
+                kubectl_apply_become_user: "{{ kube_api_user }}"
+                kubectl_apply_manifest_description: "cert-manager local CA resources"
+                kubectl_apply_manifest_path: "{{ cert_manager_local_ca_resources_tempdir.path }}/cert-manager-local-ca-resources.yaml"
+                kubectl_apply_manifest_yaml_text: ""
+                kubectl_apply_use_kustomize: false
+                kubectl_apply_namespace: ""
 
           always:
             - name: "Remove the temporary directory for the cert-manager local CA resources manifest"

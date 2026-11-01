@@ -170,12 +170,13 @@
         - name: "Apply the Longhorn ancillary resources manifest"
           ansible.builtin.include_role:
             name: kubectl_apply
-            vars:
-              kubectl_apply_manifest_description: "Longhorn ancillary resources manifest"
-              kubectl_apply_manifest_path: "{{ longhorn_middleware_tempdir.path }}/longhorn-namespace-and-related-resources.yaml"
-              kubectl_apply_manifest_yaml_text: ""
-              kubectl_apply_use_kustomize: false
-              kubectl_apply_namespace: ""
+          vars:
+            kubectl_apply_become_user: "{{ kube_api_user }}"
+            kubectl_apply_manifest_description: "Longhorn ancillary resources manifest"
+            kubectl_apply_manifest_path: "{{ longhorn_middleware_tempdir.path }}/longhorn-namespace-and-related-resources.yaml"
+            kubectl_apply_manifest_yaml_text: ""
+            kubectl_apply_use_kustomize: false
+            kubectl_apply_namespace: ""
 
       always:
         - name: "Remove the temporary directory for the Longhorn ancillary resources manifest"
