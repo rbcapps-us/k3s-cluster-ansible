@@ -19,8 +19,8 @@ This role has no defaults file. Shared settings normally come from
 Delete `k3s-*.conf` files from `/etc/keepalived/conf.d`. If other `*.conf` files
 remain there, restart Keepalived and preserve the package and configuration
 directory. Otherwise, gather service facts, stop and disable an existing
-`keepalived.service` when the service list is empty, uninstall the package, and
-remove `/etc/keepalived` recursively. The role uses privilege escalation.
+`keepalived.service` when the service list is empty, uninstall the package.
+The role uses privilege escalation.
 
 Preservation is based only on non-K3s `*.conf` files in `conf.d`; back up other
 custom configuration before running this role. Uninstalling the load balancer
