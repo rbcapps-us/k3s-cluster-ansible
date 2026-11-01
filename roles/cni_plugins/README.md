@@ -7,7 +7,7 @@ targeted node. See [defaults](defaults/main.yml) and
 ## Inputs and requirements
 
 | Variable | Type | Purpose |
-| --- | --- | --- | |
+| --- | --- | --- |
 | `cni_plugins_version` | str | Exact CNI plugin release version. |
 | `k3s_data_current_symlink` | str | Existing K3s data symlink used to resolve the binary directory. |
 

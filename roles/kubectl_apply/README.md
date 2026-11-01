@@ -17,7 +17,7 @@ The registered host variable `kubectl_apply_result` contains the shell result, i
 ```yaml
 - name: "Apply a manifest"
   ansible.builtin.include_role:
-    name: kubectl_apply
+    name: rbcapps_us.k3s_cluster_ansible.kubectl_apply
   vars:
     kubectl_apply_manifest_description: "Application resources"
     kubectl_apply_manifest_path: "/tmp/resources.yaml"
