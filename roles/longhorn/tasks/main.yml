@@ -1,6 +1,5 @@
 - name: "Assert that at least one set of Longhorn UI credentials is provided if the Longhorn ingress is enabled"
   when: longhorn_ingress_enabled
-  run_once: true
   ansible.builtin.assert:
     that: 'longhorn_ui_credentials | length > 0'
 
@@ -169,32 +168,14 @@
           changed_when: false
 
         - name: "Apply the Longhorn ancillary resources manifest"
-          ansible.builtin.shell:
-            cmd: |
-              set -euo pipefail
-
-              echo "Checking for differences in the Longhorn ancillary resources manifest before applying changes"
-              set +e
-              kubectl diff -f {{ longhorn_middleware_tempdir.path | quote }}/longhorn-namespace-and-related-resources.yaml
-              kubectl_diff_retval="$?"
-              set -e
-
-              if [ "$kubectl_diff_retval" -ne 0 ]; then
-                  # Exit code 1 from kubectl diff indicates differences were found.
-                  # Any other non-zero exit code indicates an unexpected error.
-                  if [ "$kubectl_diff_retval" -ne 1 ]; then
-                      echo "kubectl diff failed with unexpected return code $kubectl_diff_retval" >&2
-                      exit "$kubectl_diff_retval"
-                  fi
-                  echo "Applying the Longhorn ancillary resources manifest"
-                  kubectl apply -f {{ longhorn_middleware_tempdir.path | quote }}/longhorn-namespace-and-related-resources.yaml
-                  exit 99
-              fi
-          args:
-            executable: /bin/bash
-          register: longhorn_ingress_middleware_apply_result
-          changed_when: "longhorn_ingress_middleware_apply_result.rc == 99"
-          failed_when: "longhorn_ingress_middleware_apply_result.rc not in [0, 99]"
+          ansible.builtin.include_role:
+            name: kubectl_apply
+            vars:
+              kubectl_apply_manifest_description: "Longhorn ancillary resources manifest"
+              kubectl_apply_manifest_path: "{{ longhorn_middleware_tempdir.path }}/longhorn-namespace-and-related-resources.yaml"
+              kubectl_apply_manifest_yaml_text: ""
+              kubectl_apply_use_kustomize: false
+              kubectl_apply_namespace: ""
 
       always:
         - name: "Remove the temporary directory for the Longhorn ancillary resources manifest"

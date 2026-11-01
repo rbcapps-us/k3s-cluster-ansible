@@ -1,68 +1,53 @@
-- name: "Create a temporary directory for the Headlamp ancillary resources manifest"
+- name: "Install Headlamp"
   run_once: true
-  ansible.builtin.tempfile:
-    state: directory
-    prefix: "headlamp-middleware"
-  register: headlamp_middleware_tempdir
-  changed_when: false
-
-- name: "Template and apply the Headlamp ancillary resources manifest; remove the temporary directory"
-  run_once: true
-  block:
-
-    - name: "Template the Headlamp ancillary resources manifest"
-      ansible.builtin.template:
-        src: "headlamp-ingress-middleware.yaml.j2"
-        dest: "{{ headlamp_middleware_tempdir.path }}/headlamp-ingress-middleware.yaml"
-        mode: '0644'
-      changed_when: false
-
-    - name: "Apply the Headlamp ancillary resources manifest"
-      become: true
-      ansible.builtin.shell:
-        cmd: |
-          set -euo pipefail
-
-          set +e
-          kubectl diff -f {{ headlamp_middleware_tempdir.path | quote }}/headlamp-ingress-middleware.yaml
-          kubectl_diff_retval="$?"
-          set -e
-
-          if [ "$kubectl_diff_retval" -ne 0 ]; then
-              # Exit code 1 from kubectl diff indicates differences were found.
-              # Any other non-zero exit code indicates an unexpected error.
-              if [ "$kubectl_diff_retval" -ne 1 ]; then
-                  echo "kubectl diff failed with unexpected return code $kubectl_diff_retval" >&2
-                  exit "$kubectl_diff_retval"
-              fi
-              kubectl apply -f {{ headlamp_middleware_tempdir.path | quote }}/headlamp-ingress-middleware.yaml
-              exit 99
-          fi
-      args:
-        executable: /bin/bash
-      register: headlamp_ingress_middleware_apply_result
-      changed_when: "headlamp_ingress_middleware_apply_result.rc == 99"
-      failed_when: "headlamp_ingress_middleware_apply_result.rc not in [0, 99]"
-
-  always:
-    - name: "Remove the temporary directory for the Headlamp ancillary resources manifest"
-      ansible.builtin.file:
-        path: "{{ headlamp_middleware_tempdir.path }}"
-        state: absent
-      changed_when: false
-
-- name: "Install or upgrade Headlamp"
   become: true
   become_user: "{{ kube_api_user }}"
   block:
-    - name: "Install or upgrade Headlamp via the Headlamp Helm chart"
-      ansible.builtin.include_role:
-        name: helm_chart_install_or_upgrade
-      vars:
-        helm_namespace: "kube-system"
-        helm_release_name: "headlamp"
-        helm_repo_name: "headlamp"
-        helm_chart_name: "headlamp"
-        helm_chart_url: "{{ headlamp_helm_chart_url }}"
-        helm_chart_version: "{{ headlamp_helm_chart_version }}"
-        helm_args: "{{ headlamp_helm_base_args + headlamp_helm_ingress_args + headlamp_helm_extra_args }}"
+
+    - name: "Create a temporary directory for the Headlamp ancillary resources manifest"
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: "headlamp-middleware"
+      register: headlamp_middleware_tempdir
+      changed_when: false
+
+    - name: "Template and apply the Headlamp ancillary resources manifest; remove the temporary directory"
+      block:
+
+        - name: "Template the Headlamp ancillary resources manifest"
+          ansible.builtin.template:
+            src: "headlamp-ingress-middleware.yaml.j2"
+            dest: "{{ headlamp_middleware_tempdir.path }}/headlamp-ingress-middleware.yaml"
+            mode: '0644'
+          changed_when: false
+
+        - name: "Apply the Headlamp ancillary resources manifest"
+          ansible.builtin.include_role:
+          name: kubectl_apply
+          vars:
+            kubectl_apply_manifest_description: "Headlamp ancillary resources manifest"
+            kubectl_apply_manifest_path: "{{ headlamp_middleware_tempdir.path }}/headlamp-ingress-middleware.yaml"
+            kubectl_apply_manifest_yaml_text: ""
+            kubectl_apply_use_kustomize: false
+            kubectl_apply_namespace: ""
+
+      always:
+        - name: "Remove the temporary directory for the Headlamp ancillary resources manifest"
+          ansible.builtin.file:
+            path: "{{ headlamp_middleware_tempdir.path }}"
+            state: absent
+          changed_when: false
+
+    - name: "Install or upgrade Headlamp"
+      block:
+        - name: "Install or upgrade Headlamp via the Headlamp Helm chart"
+          ansible.builtin.include_role:
+            name: helm_chart_install_or_upgrade
+          vars:
+            helm_namespace: "kube-system"
+            helm_release_name: "headlamp"
+            helm_repo_name: "headlamp"
+            helm_chart_name: "headlamp"
+            helm_chart_url: "{{ headlamp_helm_chart_url }}"
+            helm_chart_version: "{{ headlamp_helm_chart_version }}"
+            helm_args: "{{ headlamp_helm_base_args + headlamp_helm_ingress_args + headlamp_helm_extra_args }}"

@@ -10,7 +10,7 @@
           - 'not kubectl_apply_use_kustomize or (kubectl_apply_manifest_path != "" and kubectl_apply_manifest_yaml_text == "")'
         fail_msg: "Specify exactly one non-empty kubectl_apply_manifest_path or kubectl_apply_manifest_yaml_text. kubectl_apply_use_kustomize requires kubectl_apply_manifest_path and cannot be used with kubectl_apply_manifest_yaml_text."
 
-    - name: "Diff and apply {{ kubectl_apply_manifest_description }}"
+    - name: "Apply {{ kubectl_apply_manifest_description }}, if needed"
       ansible.builtin.shell:
         cmd: |
           set -euo pipefail

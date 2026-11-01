@@ -35,7 +35,7 @@ create a Certificate in `kube-system`, configure Traefik's default TLSStore, and
 write a Traefik HelmChartConfig enabling HTTPS and HTTP-to-HTTPS redirects.
 
 The local manifest is applied only when `kubectl diff` returns `1`.
-`cert_manager_local_ca_resources_apply_result` records the result: `0` means
+`kubectl_apply_result` records the result: `0` means
 unchanged, `99` means successfully applied, and other codes fail. Temporary files
 are removed in an `always` block. Disabling an option does not explicitly delete
 resources created by an earlier run.

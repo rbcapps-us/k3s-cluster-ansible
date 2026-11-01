@@ -31,7 +31,7 @@ The chart installation uses `kube_api_user`, from [init](../init/README.md), via
 the shared [Helm role](../helm_chart_install_or_upgrade/README.md).
 Base, ingress, and extra argument lists are concatenated and passed to helm.
 
-`headlamp_ingress_middleware_apply_result` records ancillary diff/apply results:
+`kubectl_apply_result` records ancillary diff/apply results:
 `0` is unchanged, `99` is a successful apply, and other codes fail.
 `helm_chart_install_or_upgrade_result` records the chart operation.
 Use [headlamp_token](../headlamp_token/README.md) to generate a login token after

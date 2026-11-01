@@ -44,30 +44,14 @@
 
         - name: "Apply the Multus-CNI kustomization.yaml manifest"
           run_once: true
-          ansible.builtin.shell:
-            cmd: |
-              set -euo pipefail
-
-              set +e
-              kubectl diff -k "{{ multus_cni_tempdir.path | quote }}"
-              kubectl_diff_retval="$?"
-              set -e
-
-              if [ "$kubectl_diff_retval" -ne 0 ]; then
-                  # Exit code 1 from kubectl diff indicates differences were found.
-                  # Any other non-zero exit code indicates an unexpected error.
-                  if [ "$kubectl_diff_retval" -ne 1 ]; then
-                      echo "kubectl diff failed with unexpected return code $kubectl_diff_retval" >&2
-                      exit "$kubectl_diff_retval"
-                  fi
-                  kubectl apply -k "{{ multus_cni_tempdir.path | quote }}"
-                  exit 99
-              fi
-          args:
-            executable: /bin/bash
-          register: multus_cni_apply_result
-          changed_when: "multus_cni_apply_result.rc == 99"
-          failed_when: "multus_cni_apply_result.rc not in [0, 99]"
+          ansible.builtin.include_role:
+            name: kubectl_apply
+            vars:
+              kubectl_apply_manifest_description: "Multus-CNI kustomization.yaml manifest"
+              kubectl_apply_manifest_path: "{{ multus_cni_tempdir.path }}"
+              kubectl_apply_manifest_yaml_text: ""
+              kubectl_apply_use_kustomize: true
+              kubectl_apply_namespace: ""
 
         - name: "Create the symlink for the multus CNI plugin in {{ cni_plugins_cni_dir }}"
           ansible.builtin.file:

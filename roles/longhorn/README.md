@@ -51,7 +51,7 @@ does not explicitly delete previously created ancillary resources.
 ## Results
 
 `longhorn_system_namespace_create_result` and
-`longhorn_ingress_middleware_apply_result` use `rc: 0` for unchanged and `99` for
+`kubectl_apply_result` use `rc: 0` for unchanged and `99` for
 successful changes; other codes fail. `helm_chart_install_or_upgrade_result`
 records the chart operation. Password verification/generation uses `no_log`, but
 ancillary manifest diff output can include Secret data. Temporary files are
