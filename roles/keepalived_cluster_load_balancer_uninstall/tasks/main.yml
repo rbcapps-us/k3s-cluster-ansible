@@ -48,8 +48,3 @@
               - keepalived
             state: absent
             update_cache: true
-
-        - name: "Remove the /etc/keepalived directory"
-          ansible.builtin.file:
-            path: "/etc/keepalived"
-            state: absent
