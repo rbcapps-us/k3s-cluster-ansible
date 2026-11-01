@@ -49,7 +49,7 @@ Discovery commands use privilege escalation and do not report changes.
 
 ```yaml
 - name: Initialize cluster settings
-  ansible.builtin.include_role:
+  ansible.builtin.import_role:
     name: rbcapps_us.k3s_cluster_ansible.init
   vars:
     num_k3s_server_nodes: 3
