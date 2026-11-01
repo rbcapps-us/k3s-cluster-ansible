@@ -33,7 +33,7 @@ ansible-galaxy install -r requirements.yml
 
 Create a file named *inventories/k3s-test-cluster/ansible-become-password.txt*, and put the password for the *ansible* user on your cluster.
 
-## Summary of Playboks in the Collection
+## List of Playboks in the Collection
 
 This collection contains the following playbooks:
 
