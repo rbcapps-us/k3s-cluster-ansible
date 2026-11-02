@@ -5,10 +5,6 @@ argument_specs:
       This role sets kubectl_apply_result to the registered shell result, including stdout, stderr and rc.
       A return code of 0 indicates no changes; 99 indicates a successful apply.
     options:
-      kubectl_apply_become_user:
-        description: "User to become when running kubectl commands.  Defaults to the value of the kube_api_user fact."
-        type: str
-        default: ""
       kubectl_apply_manifest_description:
         description: "Description of the manifest, displayed in the diff and apply task name."
         type: str

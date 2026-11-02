@@ -1,7 +1,5 @@
 - name: "Install or upgrade {{ helm_release_name }} via its Helm chart"
   run_once: true
-  become: true
-  become_user: "{{ kube_api_user }}"
   block:
 
     - name: "Create a temporary work directory for helm and kubectl to do their work"

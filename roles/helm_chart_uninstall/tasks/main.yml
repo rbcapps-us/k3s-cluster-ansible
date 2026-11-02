@@ -1,7 +1,5 @@
 - name: "Uninstall Helm release {{ helm_release_name }}, if it is installed"
   run_once: true
-  become: true
-  become_user: "{{ kube_api_user }}"
   ansible.builtin.shell:
     cmd: |
       set -e

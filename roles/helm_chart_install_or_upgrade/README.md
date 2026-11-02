@@ -1,8 +1,7 @@
 # Role: helm_chart_install_or_upgrade
 
-Install a Helm release or upgrade it when the chart version or rendered resources
-differ from the live cluster. See [defaults](defaults/main.yml) and
-[argument specifications](meta/argument_specs.yml).
+Install a Helm release or upgrade it when the chart version or rendered resources differ from the live cluster.
+The calling user must have access to the Kubernetes API.
 
 ## Inputs
 
@@ -19,11 +18,8 @@ differ from the live cluster. See [defaults](defaults/main.yml) and
 | `helm_diff_kustomize_patches_yaml` | str | `""` | YAML list of Kustomize patches used only for diff. |
 | `helm_diff_yq_filter_expressions` | list of str | `[]` | Sequential Python `yq` filters used only for diff. |
 
-The role also reads `kube_api_user` from [init](../init/README.md).
-It runs once as that user using privilege escalation. The selected host needs
-Helm, `kubectl`, `jq`, working cluster credentials, and access to the chart source.
-Python `yq` is required when filters are supplied. The namespace must exist unless
-`helm_args` includes `--create-namespace`.
+The calling user must have access to the Kubernetes API. The selected host needs
+The namespace must exist unless `helm_args` includes `--create-namespace`.
 
 ## Upgrade decision and results
 

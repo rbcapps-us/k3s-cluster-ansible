@@ -2,8 +2,8 @@ argument_specs:
   main:
     short_description: "Install or upgrade a package using its Helm chart"
     description: |
-      This role sets the following variables on the host:
-        - helm_chart_install_or_upgrade_result: A registered result from ansible.builtin.shell for the commands which were executed.
+      This role sets helm_chart_install_or_upgrade_result to the registered shell result, including stdout, stderr and rc.
+      A return code of 0 indicates no changes; 99 indicates a successful helm installation or upgrade (with changes).
     options:
       helm_namespace:
         description: 'The Kubernetes namespace into which the application will be installed'

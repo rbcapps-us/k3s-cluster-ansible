@@ -1,7 +1,5 @@
 - name: "Run kubectl apply tasks"
   run_once: true
-  become: true
-  become_user: "{{ kubectl_apply_become_user }}"
   block:
 
     - name: "Validate kubectl apply manifest inputs"

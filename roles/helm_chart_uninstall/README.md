@@ -1,7 +1,7 @@
 # Role: helm_chart_uninstall
 
-Uninstall a Helm release if it exists, without reporting a change for an absent
-release. See [argument specifications](meta/argument_specs.yml).
+Uninstall a Helm release if it exists, without reporting a change for an absent release.
+The calling user must have access to the Kubernetes API.
 
 ## Inputs and requirements
 
@@ -10,9 +10,7 @@ release. See [argument specifications](meta/argument_specs.yml).
 | `helm_namespace` | str | Required | Namespace containing the release. |
 | `helm_release_name` | str | Required | Release to uninstall. |
 
-There is no defaults file. The role also reads `kube_api_user`
-from [init](../init/README.md). It runs once as that user with privilege escalation.
-The selected host needs Helm and working Kubernetes credentials.
+The calling user must have access to the Kubernetes API.
 
 ## Behavior and results
 
