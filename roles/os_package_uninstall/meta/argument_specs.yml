@@ -1,0 +1,16 @@
+argument_specs:
+  main:
+    short_description: "Remove a list of operating system packages"
+    description: |
+      Removes the requested packages using the native package manager for the host's Linux distribution.
+      Debian-family packages are purged; other supported package managers remove the packages without purging configuration.
+      This role must be executed with superuser privileges.
+    options:
+      package_names:
+        description: "A list containing the names of the operating system packages to remove."
+        type: list
+        elements: str
+        required: true
+      update_cache:
+        description: "Whether to update the package manager cache before removing packages. Defaults to false."
+        type: bool

@@ -63,6 +63,7 @@ This collection contains the following roles:
 * [rbcapps_us.k3s_cluster_ansible.kubectl_apply](roles/kubectl_apply/README.md): Diffs and applies Kubernetes manifests or Kustomize resources, reporting changes only when an apply is needed.
 * [rbcapps_us.k3s_cluster_ansible.longhorn](roles/longhorn/README.md): Installs Longhorn storage, an RWX StorageClass, and optional authenticated dashboard ingress.
 * [rbcapps_us.k3s_cluster_ansible.multus_cni](roles/multus_cni/README.md): Installs Multus CNI with K3s-specific paths and Flannel delegation for secondary pod networks.
+* [rbcapps_us.k3s_cluster_ansible.os_package_uninstall](roles/os_package_uninstall/README.md): Removes operating system packages using the host's package manager.
 * [rbcapps_us.k3s_cluster_ansible.prereq](roles/prereq/README.md): Installs prerequisite packages and creates the Kubernetes API access user and group on server nodes.
 * [rbcapps_us.k3s_cluster_ansible.reboot](roles/reboot/README.md): Reboots targeted nodes and waits for them to return.
 * [rbcapps_us.k3s_cluster_ansible.reflector](roles/reflector/README.md): Installs Emberstack Reflector for replication of annotated Secrets and ConfigMaps across namespaces.
