@@ -43,8 +43,14 @@
             enabled: false
 
         - name: "Uninstall keepalived"
-          ansible.builtin.package:
-            name:
+          ansible.builtin.include_role:
+            name: os_package_uninstall
+          vars:
+            package_names:
               - keepalived
-            state: absent
             update_cache: true
+
+        - name: "Remove the /etc/keepalived directory"
+          ansible.builtin.file:
+            path: "/etc/keepalived"
+            state: absent

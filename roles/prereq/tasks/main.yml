@@ -18,10 +18,11 @@
 
     - name: "Remove the multipath-tools package, because it interferes with Longhorn filesystem creation"
       when: install_longhorn
-      ansible.builtin.package:
-        name:
+      ansible.builtin.include_role:
+        name: os_package_uninstall
+      vars:
+        package_names:
           - multipath-tools
-        state: absent
         update_cache: true
 
     - name: "Kill any running multipath processes"
@@ -38,6 +39,7 @@
             else ['python3', 'python3-pip']
           }}
         state: present
+        update_cache: true
 
     - name: "Install required pip modules"
       ansible.builtin.pip:
