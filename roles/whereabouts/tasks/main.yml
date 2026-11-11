@@ -17,6 +17,19 @@
           if [ "$helm_status_retval" -eq 0 ]; then
               echo "Whereabouts release found in the default namespace, removing it."
               helm --namespace default uninstall whereabouts
+
+              for crd in "ippools.whereabouts.cni.cncf.io" "overlappingrangeipreservations.whereabouts.cni.cncf.io"; do
+                  set +e
+                  kubectl get crd "$crd" >/dev/null 2>&1
+                  get_crd_result="$?"
+                  set -e
+
+                  if [ "$get_crd_result" -eq 0 ]; then
+                      echo "Deleting Whereabouts CRD: $crd"
+                      kubectl delete crd "$crd"
+                  fi
+              done
+
               exit 99
           fi
 
