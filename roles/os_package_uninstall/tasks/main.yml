@@ -1,28 +1,44 @@
 - name: "Purge a list of packages on Debian/Ubuntu family: {{ package_names | join(', ') }}"
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts['os_family'] == 'Debian'
   ansible.builtin.apt:
     name: "{{ package_names }}"
     state: absent
     purge: true
     update_cache: "{{ update_cache }}"
+  register: os_package_uninstall_apt_result
+  retries: 10
+  delay: 20
+  until: os_package_uninstall_apt_result is success
 
 - name: "Remove a list of packages on RedHat/Rocky/Alma/Fedora family: {{ package_names | join(', ') }}"
-  when: ansible_os_family == 'RedHat'
+  when: ansible_facts['os_family'] == 'RedHat'
   ansible.builtin.dnf:
     name: "{{ package_names }}"
     state: absent
     update_cache: "{{ update_cache }}"
+  register: os_package_uninstall_dnf_result
+  retries: 10
+  delay: 20
+  until: os_package_uninstall_dnf_result is success
 
 - name: "Remove a list of packages on SUSE family: {{ package_names | join(', ') }}"
-  when: ansible_os_family == 'Suse'
+  when: ansible_facts['os_family'] == 'Suse'
   community.general.zypper:
     name: "{{ package_names }}"
     state: absent
     update_cache: "{{ update_cache }}"
+  register: os_package_uninstall_zypper_result
+  retries: 10
+  delay: 20
+  until: os_package_uninstall_zypper_result is success
 
 - name: "Remove a list of packages on unknown Linux families: {{ package_names | join(', ') }}"
-  when: ansible_os_family not in ['Debian', 'RedHat', 'Suse']
+  when: ansible_facts['os_family'] not in ['Debian', 'RedHat', 'Suse']
   ansible.builtin.package:
     name: "{{ package_names }}"
     state: absent
     update_cache: "{{ update_cache }}"
+  register: os_package_uninstall_package_result
+  retries: 10
+  delay: 20
+  until: os_package_uninstall_package_result is success
