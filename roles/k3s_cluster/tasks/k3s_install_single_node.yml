@@ -76,9 +76,11 @@
         cmd: |
           set -euo pipefail
 
-          kubectl cordon {{ k3s_install_host.split('.')[0] | quote }}
-          kubectl drain {{ k3s_install_host.split('.')[0] | quote }} --ignore-daemonsets --delete-emptydir-data --force
-          kubectl delete node {{ k3s_install_host.split('.')[0] | quote }}
+          node={{ k3s_install_host.split('.')[0] | quote }}
+
+          kubectl cordon "$node"
+          kubectl drain "$node" --ignore-daemonsets --delete-emptydir-data --force
+          kubectl delete node "$node"
       args:
         executable: /bin/bash
       changed_when: true
@@ -98,23 +100,38 @@
         executable: /bin/bash
       changed_when: true
 
-    ##############################################################################
-    # INSTALL K3S ON THE NODE; JOIN THE CLUSTER IF WE HAVE ANOTHER RUNNING NODE. #
-    ##############################################################################
-
-    - name: "If this node is listed in the cluster's node list, delete it from the cluster"
+    - name: "Ensure node {{ k3s_install_host }} is not still a member of etcd on the cluster, executing the etcdctl commands on: {{ k3s_cluster_k3s_api_host }}"
       when: 'k3s_cluster_k3s_api_host != ""'
+      # We have to default this to a non-empty host in order to avoid getting an error about an empty delegate_to value,
+      # even though the "when" condition would prevent this task from running in that case.
       delegate_to: '{{ k3s_cluster_k3s_api_host | default(k3s_install_host, true) }}'
       ansible.builtin.shell:
         cmd: |
           set -euo pipefail
 
-          kubectl delete node {{ k3s_install_host.split('.')[0] | quote }}
+          node={{ k3s_install_host.split('.')[0] | quote }}
+
+          export ETCDCTL_ENDPOINTS='https://127.0.0.1:2379'
+          export ETCDCTL_CACERT='/var/lib/rancher/k3s/server/tls/etcd/server-ca.crt'
+          export ETCDCTL_CERT='/var/lib/rancher/k3s/server/tls/etcd/server-client.crt'
+          export ETCDCTL_KEY='/var/lib/rancher/k3s/server/tls/etcd/server-client.key'
+          export ETCDCTL_API=3
+
+          member_id=$(etcdctl member list  -w json | jq -r '.members[] | select(.name | startswith("'$node'-")).ID' | xargs printf "%x\n" || true)
+          if [ "$member_id" != "" ] && [ "$member_id" != "0" ]; then
+              etcdctl member remove "$member_id"
+              exit 99
+          fi
+          exit 0
       args:
         executable: /bin/bash
-      register: k3s_cluster_result_delete_my_node
-      failed_when: false
-      changed_when: 'k3s_cluster_result_delete_my_node.rc == 0'
+      register: etcd_member_remove_result
+      changed_when: 'etcd_member_remove_result.rc == 99'
+      failed_when: 'etcd_member_remove_result.rc not in [0, 99]'
+
+    ##############################################################################
+    # INSTALL K3S ON THE NODE; JOIN THE CLUSTER IF WE HAVE ANOTHER RUNNING NODE. #
+    ##############################################################################
 
     - name: "Create a temporary directory for the k3s installer script"
       when: 'k3s_cluster_k3s_installed_info.need_install_or_reinstall'

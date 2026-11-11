@@ -13,6 +13,13 @@
           - curl
           - jq
           - wireguard
+          - |
+            {{
+              "etcd" if ansible_facts["os_family"] == "RedHat"
+              else "etcdctl" if ansible_facts["os_family"] == "Suse"
+              else "etcd-ctl" if ansible_facts["os_family"] == "Alpine"
+              else "etcd-client"
+            }}
         state: present
         update_cache: true
 
